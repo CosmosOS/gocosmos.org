@@ -1,0 +1,261 @@
+/* ============================================================
+   Cosmos Design System — colors, type, spacing tokens
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ---------- Neutrals (dark-first) ---------- */
+  --bg-0: #0A0A0F;          /* page background */
+  --bg-1: #0B0B11;          /* code block / hero panel */
+  --bg-2: #0F0F15;          /* card */
+  --bg-3: #15151D;          /* raised card / hover */
+  --bg-4: #1A1A24;          /* nested */
+
+  --border-1: #1F1F2A;      /* hairline */
+  --border-2: #2A2A38;      /* hover hairline */
+  --border-3: #3A3A4D;      /* focus ring base */
+
+  --fg-1: #F5F5FA;          /* primary text */
+  --fg-2: #A0A0B5;          /* secondary text */
+  --fg-3: #6E6E85;          /* tertiary / captions */
+  --fg-4: #4A4A5C;          /* placeholder / disabled */
+
+  /* ---------- Brand accent — pulled from logo (cream halo on dark slate) ---------- */
+  --accent:       #F2EBDA;     /* cream halo — primary signal */
+  --accent-hover: #FFFFFF;
+  --accent-dim:   rgba(242, 235, 218, 0.10);
+  --accent-line:  rgba(242, 235, 218, 0.28);
+
+  /* Logo-derived surface tones */
+  --slate-0: #1C1C20;          /* logo body slate */
+  --slate-1: #2A2A30;
+  --halo:    #F2EBDA;          /* cream outline */
+
+  /* Sticker sheen — subtle horizontal metallic light, lifted from the logo */
+  --sheen: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 38%,
+    rgba(0, 0, 0, 0.00) 50%,
+    rgba(255, 255, 255, 0.03) 62%,
+    rgba(0, 0, 0, 0.00) 100%);
+
+  /* Brand "fills" stay aliased so existing styles keep resolving */
+  --grad-brand: var(--accent);
+  --grad-brand-soft: var(--accent-dim);
+
+  /* Hero atmosphere — warm cream wash instead of electric blue */
+  --grad-hero-glow: radial-gradient(
+    ellipse 70% 50% at 50% 0%,
+    rgba(242, 235, 218, 0.07) 0%,
+    transparent 70%
+  );
+
+  /* ---------- Semantic ---------- */
+  --semantic-success: #3DDC84;
+  --semantic-warn:    #FFB454;
+  --semantic-error:   #FF6B6B;
+  --semantic-info:    #5EA8FF;
+
+  /* ---------- Type stacks ---------- */
+  --font-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---------- Type scale ---------- */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+  --text-4xl: 40px;
+  --text-5xl: 56px;
+  --text-6xl: 72px;
+  --text-7xl: 88px;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* ---------- Radii ---------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow-violet: 0 0 32px rgba(242, 235, 218, 0.18);
+  --shadow-focus: 0 0 0 3px rgba(242, 235, 218, 0.35);
+  --shadow-halo: 0 0 0 1.5px rgba(242, 235, 218, 0.12), 0 12px 28px rgba(0, 0, 0, 0.55);
+  --shadow-inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+
+  /* ---------- Layout ---------- */
+  --container-max: 1200px;
+  --reading-max: 1080px;
+  --nav-h: 64px;
+}
+
+/* ---------- Light mode ---------- */
+[data-theme='light'] {
+  --bg-0: #FFFFFF;
+  --bg-1: #FAFAFC;
+  --bg-2: #F5F5F8;
+  --bg-3: #ECECF1;
+  --bg-4: #E0E0E8;
+
+  --border-1: #E8E8EE;
+  --border-2: #D4D4DC;
+  --border-3: #B8B8C4;
+
+  --fg-1: #0A0A0F;
+  --fg-2: #4A4A5C;
+  --fg-3: #6E6E85;
+  --fg-4: #A0A0B5;
+
+  --grad-hero-glow: radial-gradient(
+    ellipse 80% 60% at 50% 20%,
+    rgba(124, 92, 255, 0.10) 0%,
+    rgba(61, 217, 214, 0.04) 35%,
+    transparent 70%
+  );
+}
+
+/* ============================================================
+   Semantic styles — drop-in classes that map to tokens
+   ============================================================ */
+
+.cs-display {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-7xl);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: var(--fg-1);
+}
+
+.cs-h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-5xl);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--fg-1);
+}
+
+.cs-h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-4xl);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--fg-1);
+}
+
+.cs-h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--fg-1);
+}
+
+.cs-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.cs-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--fg-1);
+}
+
+.cs-body-2 {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+.cs-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--fg-3);
+}
+
+.cs-code {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--fg-1);
+}
+
+.cs-code-inline {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 2px 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+/* Accent text — flat, no gradient */
+.cs-gradient-text { color: var(--accent); }
+
+/* ============================================================
+   Base reset
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg-0);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
