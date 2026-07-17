@@ -1,5 +1,13 @@
-/* global React */
-const ERAS = [
+interface Era {
+  tag: string;
+  year: string;
+  title: string;
+  body: string;
+  accent: 'fg-3' | 'gradient';
+  current?: boolean;
+}
+
+const ERAS: Era[] = [
   {
     tag: 'Gen1',
     year: '2007',
@@ -24,7 +32,7 @@ const ERAS = [
   },
 ];
 
-function Timeline() {
+export function Timeline() {
   return (
     <section className="section section-tinted" id="timeline">
       <div className="container">
@@ -55,4 +63,3 @@ function Timeline() {
     </section>
   );
 }
-window.Timeline = Timeline;

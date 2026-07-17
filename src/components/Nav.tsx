@@ -1,11 +1,13 @@
-/* global React, ICONS, useTheme */
-function Nav() {
+import { ICONS } from '../icons';
+import { useTheme } from '../hooks/useTheme';
+
+export function Nav() {
   const [theme, setTheme] = useTheme();
   return (
     <header className="nav">
       <div className="nav-inner">
         <a className="nav-brand" href="#top">
-          <img src="assets/cosmos-logo.png" alt="Cosmos" />
+          <img src="/assets/cosmos-logo.png" alt="Cosmos" />
         </a>
         <nav className="nav-links">
           <a href="#features">Features</a>
@@ -28,4 +30,3 @@ function Nav() {
     </header>
   );
 }
-window.Nav = Nav;

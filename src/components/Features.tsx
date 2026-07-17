@@ -1,5 +1,12 @@
-/* global React, ICONS */
-const FEATURES = [
+import { ICONS, type IconName } from '../icons';
+
+interface Feature {
+  icon: IconName;
+  title: string;
+  desc: string;
+}
+
+const FEATURES: Feature[] = [
   { icon: 'code', title: 'Modern C# 14 / .NET 10', desc: 'Full language support — generics, LINQ, async-ready, no reflection trickery required.' },
   { icon: 'zap', title: 'NativeAOT compilation', desc: "Built on Microsoft's official AOT compiler. No JIT, no managed runtime dependency, fast cold boot." },
   { icon: 'cpu', title: 'Dual-architecture', desc: 'x64 and ARM64 from a single C# codebase. Compile-time selection via RuntimeIdentifier.' },
@@ -10,7 +17,7 @@ const FEATURES = [
   { icon: 'flask', title: '10 kernel test suites', desc: 'HelloWorld, Memory, TypeCasting, Timer, Network, Runtime, Threading, Math, GarbageCollector, Graphics — out of the box.' },
 ];
 
-function Features() {
+export function Features() {
   return (
     <section className="section" id="features">
       <div className="container">
@@ -32,4 +39,3 @@ function Features() {
     </section>
   );
 }
-window.Features = Features;

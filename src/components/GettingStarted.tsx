@@ -1,9 +1,9 @@
-/* global React, ICONS */
-const { useState } = React;
+import { useState } from 'react';
+import { ICONS } from '../icons';
 
 const SNIPPET = `dotnet tool install -g Cosmos.Tools && cosmos install`;
 
-function GettingStarted() {
+export function GettingStarted() {
   const [copied, setCopied] = useState(false);
   function copy() {
     navigator.clipboard.writeText(SNIPPET).then(() => {
@@ -27,10 +27,10 @@ function GettingStarted() {
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
-          <pre className="snippet-body"><code>{`${'\u00a0'}`}<span className="tok-prompt">$</span> git <span className="tok-arg">clone</span> https://github.com/valentinbreiz/nativeaot-patcher
-{'\u00a0'}<span className="tok-prompt">$</span> <span className="tok-arg">cd</span> nativeaot-patcher
-{'\u00a0'}<span className="tok-prompt">$</span> ./.devcontainer/postCreateCommand.sh
-{'\u00a0'}<span className="tok-prompt">$</span> <span className="tok-cmd">make run</span> KERNEL=<span className="tok-val">HelloWorld</span></code></pre>
+          <pre className="snippet-body"><code>{' '}<span className="tok-prompt">$</span> git <span className="tok-arg">clone</span> https://github.com/valentinbreiz/nativeaot-patcher
+{' '}<span className="tok-prompt">$</span> <span className="tok-arg">cd</span> nativeaot-patcher
+{' '}<span className="tok-prompt">$</span> ./.devcontainer/postCreateCommand.sh
+{' '}<span className="tok-prompt">$</span> <span className="tok-cmd">make run</span> KERNEL=<span className="tok-val">HelloWorld</span></code></pre>
         </div>
         <div className="docs-link" data-reveal>
           <a href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">
@@ -41,4 +41,3 @@ function GettingStarted() {
     </section>
   );
 }
-window.GettingStarted = GettingStarted;

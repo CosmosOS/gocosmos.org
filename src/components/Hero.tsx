@@ -1,7 +1,14 @@
-/* global React, ICONS */
-const { useEffect, useState } = React;
+import { useEffect, useState } from 'react';
+import { ICONS } from '../icons';
 
-const BOOT_LINES = [
+type BootLineKind = 'cmd' | 'log' | 'boot' | 'k' | 'cursor';
+
+interface BootLine {
+  t: BootLineKind;
+  text: string;
+}
+
+const BOOT_LINES: BootLine[] = [
   { t: 'cmd', text: 'make run KERNEL=HelloWorld' },
   { t: 'log', text: '→ patcher: rewriting 142 IL methods (Mono.Cecil)' },
   { t: 'log', text: '→ ilc: 18.2s · gcc-link: 2.1s · xorriso: 0.4s' },
@@ -14,8 +21,8 @@ const BOOT_LINES = [
   { t: 'cursor', text: '' },
 ];
 
-function Hero() {
-  const [shown, setShown] = useState([]);
+export function Hero() {
+  const [shown, setShown] = useState<BootLine[]>([]);
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   useEffect(() => {
@@ -82,4 +89,3 @@ function Hero() {
     </section>
   );
 }
-window.Hero = Hero;

@@ -1,13 +1,21 @@
-/* global React, ICONS */
-const LINKS = [
+import { ICONS, type IconName } from '../icons';
+
+interface CommunityLink {
+  icon: IconName;
+  title: string;
+  desc: string;
+  href: string;
+}
+
+const LINKS: CommunityLink[] = [
   { icon: 'github', title: 'GitHub repo', desc: 'Source, releases, and discussion.', href: 'https://github.com/valentinbreiz/nativeaot-patcher' },
   { icon: 'bug', title: 'Issues', desc: 'Bug reports and feature requests.', href: 'https://github.com/valentinbreiz/nativeaot-patcher/issues' },
-  { icon: 'list', title: 'Priority board', desc: 'What we\u2019re working on, in what order.', href: 'https://github.com/users/valentinbreiz/projects/2/views/2' },
+  { icon: 'list', title: 'Priority board', desc: 'What we’re working on, in what order.', href: 'https://github.com/users/valentinbreiz/projects/2/views/2' },
   { icon: 'book', title: 'Documentation', desc: 'Install, build, plugs, GC, testing.', href: 'https://valentinbreiz.github.io/nativeaot-patcher/index.html' },
   { icon: 'msg', title: 'Discord', desc: 'Chat with the team and other kernel devs.', href: '#' },
 ];
 
-function Community() {
+export function Community() {
   return (
     <section className="section section-tinted" id="community">
       <div className="container">
@@ -32,4 +40,3 @@ function Community() {
     </section>
   );
 }
-window.Community = Community;

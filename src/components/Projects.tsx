@@ -1,29 +1,35 @@
-/* global React, ICONS */
-const { useState, useEffect, useRef } = React;
+import { useEffect, useRef, useState } from 'react';
 
-const SLIDES = [
-  { src: 'assets/zero.png', alt: 'Cosmos example 0' },
-  { src: 'assets/one.png', alt: 'Cosmos example 1' },
-  { src: 'assets/two.png', alt: 'Cosmos example 2' },
-  { src: 'assets/three.png', alt: 'Cosmos example 3' },
-  { src: 'assets/four.png', alt: 'Cosmos example 4' },
+interface Slide {
+  src: string;
+  alt: string;
+}
+
+const SLIDES: Slide[] = [
+  { src: '/assets/zero.png', alt: 'Cosmos example 0' },
+  { src: '/assets/one.png', alt: 'Cosmos example 1' },
+  { src: '/assets/two.png', alt: 'Cosmos example 2' },
+  { src: '/assets/three.png', alt: 'Cosmos example 3' },
+  { src: '/assets/four.png', alt: 'Cosmos example 4' },
 ];
 
 const AUTOPLAY_MS = 5000;
 
-function Projects() {
+export function Projects() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const count = SLIDES.length;
-  const go = (n) => setIndex((n + count) % count);
-  const timerRef = useRef(null);
+  const go = (n: number) => setIndex((n + count) % count);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (paused) return undefined;
-    timerRef.current = setInterval(() => {
+    timerRef.current = window.setInterval(() => {
       setIndex(i => (i + 1) % count);
     }, AUTOPLAY_MS);
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current !== null) clearInterval(timerRef.current);
+    };
   }, [paused, count]);
 
   return (
@@ -69,4 +75,3 @@ function Projects() {
     </section>
   );
 }
-window.Projects = Projects;

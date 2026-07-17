@@ -1,5 +1,64 @@
-/* global React */
-const { useEffect, useRef } = React;
+import { useEffect, useRef } from 'react';
+
+type RGB = readonly [number, number, number];
+
+interface Star {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  vx: number;
+  vy: number;
+  tw: number;
+  twSpeed: number;
+  color: RGB;
+}
+
+interface Layer {
+  stars: Star[];
+  parallax: number;
+}
+
+interface Nebula {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  color: RGB;
+  a: number;
+  vx: number;
+  vy: number;
+  t: number;
+}
+
+interface Galaxy {
+  cx: number;
+  cy: number;
+  r: number;
+  rot: number;
+}
+
+interface ShootingStar {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  max: number;
+}
+
+const COLORS = {
+  cream:    [242, 235, 218],
+  iceBlue:  [180, 200, 230],
+  white:    [245, 245, 250],
+  nebulaA:  [120, 95, 180],   // muted violet
+  nebulaB:  [70, 130, 180],   // muted teal
+  galaxyHi: [242, 235, 218],
+} satisfies Record<string, RGB>;
+
+function rgba(c: RGB, a: number): string {
+  return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+}
 
 /**
  * Cosmos — animated background.
@@ -11,36 +70,28 @@ const { useEffect, useRef } = React;
  * Palette: cream halo + cool blue-white, lifted from the logo.
  * Respects prefers-reduced-motion (renders one static frame, no rAF).
  */
-function Starfield() {
-  const ref = useRef(null);
+export function Starfield() {
+  const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
-    let raf, w, h;
-    let layers = [];           // [{stars: [...]}]
-    let nebulae = [];          // soft drifting clouds
-    let galaxy = null;         // single rotating disc
-    let shooting = null;       // active shooting star
+    if (!ctx) return;
+    let raf = 0;
+    let w = 0;
+    let h = 0;
+    let layers: Layer[] = [];
+    let nebulae: Nebula[] = [];
+    let galaxy: Galaxy | null = null;
+    let shooting: ShootingStar | null = null;
     let nextShooting = 0;
     let mouseX = 0, mouseY = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const COLORS = {
-      cream:    [242, 235, 218],
-      iceBlue:  [180, 200, 230],
-      white:    [245, 245, 250],
-      nebulaA:  [120, 95, 180],   // muted violet
-      nebulaB:  [70, 130, 180],   // muted teal
-      galaxyHi: [242, 235, 218],
-    };
-
-    function rgba(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
-
-    function makeLayer(density, sizeMin, sizeMax, speedMul, parallax) {
+    function makeLayer(density: number, sizeMin: number, sizeMax: number, speedMul: number, parallax: number): Layer {
       const count = Math.floor((w * h) / density);
-      const stars = [];
+      const stars: Star[] = [];
       for (let i = 0; i < count; i++) {
         const tint = Math.random();
         stars.push({
@@ -59,6 +110,7 @@ function Starfield() {
     }
 
     function resize() {
+      if (!canvas || !ctx) return;
       w = canvas.clientWidth; h = canvas.clientHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -80,7 +132,8 @@ function Starfield() {
       galaxy = { cx: w * 0.78, cy: h * 0.22, r: Math.min(w, h) * 0.14, rot: 0 };
     }
 
-    function drawNebula(n) {
+    function drawNebula(n: Nebula) {
+      if (!ctx) return;
       // Slow drift + breathing alpha so it doesn't look static
       n.t += 0.002;
       n.x += n.vx; n.y += n.vy;
@@ -105,6 +158,7 @@ function Starfield() {
     }
 
     function drawGalaxy() {
+      if (!ctx || !galaxy) return;
       galaxy.rot += 0.0008;
       ctx.save();
       ctx.translate(galaxy.cx, galaxy.cy);
@@ -129,7 +183,8 @@ function Starfield() {
       ctx.restore();
     }
 
-    function drawStars(t) {
+    function drawStars() {
+      if (!ctx) return;
       // Mouse parallax target (smoothly lerped via mouseX/mouseY which are -1..1)
       for (const layer of layers) {
         const ox = mouseX * layer.parallax;
@@ -154,7 +209,7 @@ function Starfield() {
       }
     }
 
-    function spawnShootingStar(t) {
+    function spawnShootingStar() {
       // Random angle that sweeps top-left → bottom-right area, gentle
       const fromLeft = Math.random() < 0.5;
       const startX = fromLeft ? -40 : w + 40;
@@ -172,7 +227,7 @@ function Starfield() {
     }
 
     function drawShooting() {
-      if (!shooting) return;
+      if (!ctx || !shooting) return;
       shooting.life++;
       shooting.x += shooting.vx;
       shooting.y += shooting.vy;
@@ -210,7 +265,8 @@ function Starfield() {
     }
 
     let smoothMx = 0, smoothMy = 0;
-    function tick(t) {
+    function tick(t: number) {
+      if (!ctx) return;
       ctx.clearRect(0, 0, w, h);
       // Smoothly approach target mouse offset
       smoothMx += (mouseX - smoothMx) * 0.04;
@@ -221,18 +277,19 @@ function Starfield() {
       // Stars (use smoothed values)
       const realMx = mouseX, realMy = mouseY;
       mouseX = smoothMx; mouseY = smoothMy;
-      drawStars(t);
+      drawStars();
       mouseX = realMx; mouseY = realMy;
       // Shooting star
       if (!shooting && t > nextShooting) {
-        spawnShootingStar(t);
+        spawnShootingStar();
         nextShooting = t + 6000 + Math.random() * 5000;
       }
       drawShooting();
       raf = requestAnimationFrame(tick);
     }
 
-    function onMouse(e) {
+    function onMouse(e: MouseEvent) {
+      if (!canvas) return;
       const r = canvas.getBoundingClientRect();
       // Normalize to -1..1 around center
       mouseX = ((e.clientX - r.left) / r.width - 0.5) * 2;
@@ -244,7 +301,7 @@ function Starfield() {
       // Single static frame
       for (const n of nebulae) drawNebula(n);
       drawGalaxy();
-      drawStars(0);
+      drawStars();
     } else {
       nextShooting = performance.now() + 3000;
       raf = requestAnimationFrame(tick);
@@ -260,4 +317,3 @@ function Starfield() {
   }, []);
   return <canvas ref={ref} className="starfield" aria-hidden="true" />;
 }
-window.Starfield = Starfield;
