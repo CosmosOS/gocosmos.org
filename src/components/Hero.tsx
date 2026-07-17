@@ -1,46 +1,68 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import * as AsciinemaPlayer from 'asciinema-player';
+import 'asciinema-player/dist/bundle/asciinema-player.css';
 import { ICONS } from '../icons';
 
-type BootLineKind = 'cmd' | 'log' | 'boot' | 'k' | 'cursor';
-
-interface BootLine {
-  t: BootLineKind;
-  text: string;
-}
-
-const BOOT_LINES: BootLine[] = [
-  { t: 'cmd', text: 'make run KERNEL=HelloWorld' },
-  { t: 'log', text: '→ patcher: rewriting 142 IL methods (Mono.Cecil)' },
-  { t: 'log', text: '→ ilc: 18.2s · gcc-link: 2.1s · xorriso: 0.4s' },
-  { t: 'log', text: '→ qemu-system-x86_64: starting (KVM accel, 512M)' },
-  { t: 'boot', text: '[boot]   Limine 8.4 — x64' },
-  { t: 'boot', text: '[boot]   framebuffer 1024×768 · UEFI GOP' },
-  { t: 'k', text: '[kernel] memory: 491.4 MiB usable · GC online' },
-  { t: 'k', text: '[kernel] interrupts: APIC up · scheduler: stride' },
-  { t: 'k', text: '[kernel] hello, bare metal.' },
-  { t: 'cursor', text: '' },
-];
-
 export function Hero() {
-  const [shown, setShown] = useState<BootLine[]>([]);
-  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const playerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reduced) { setShown(BOOT_LINES); return; }
-    let i = 0;
+    const node = playerRef.current;
+    if (!node) return undefined;
+    let player: ReturnType<typeof AsciinemaPlayer.create> | undefined;
+    let observer: IntersectionObserver | undefined;
     let cancelled = false;
-    function next() {
+    let timer = 0;
+
+    // The player sizes its type to fill the width by measuring glyphs at
+    // creation time and never re-measures on font swap — so wait for the mono
+    // webfont (with a timeout fallback) before creating it.
+    const fontsReady = 'fonts' in document
+      ? Promise.all([document.fonts.load("14px 'JetBrains Mono'"), document.fonts.ready]).catch(() => undefined)
+      : Promise.resolve(undefined);
+    const fallback = new Promise(resolve => { timer = window.setTimeout(resolve, 1500); });
+
+    Promise.race([fontsReady, fallback]).then(() => {
       if (cancelled) return;
-      setShown(BOOT_LINES.slice(0, i + 1));
-      i++;
-      if (i < BOOT_LINES.length) {
-        const delay = BOOT_LINES[i - 1].t === 'cmd' ? 700 : 380 + Math.random() * 200;
-        setTimeout(next, delay);
-      }
-    }
-    setTimeout(next, 600);
-    return () => { cancelled = true; };
-  }, [reduced]);
+      player = AsciinemaPlayer.create('/assets/helloworld.cast', node, {
+        cols: 100,
+        rows: 20,
+        preload: true,
+        loop: true,
+        controls: false,
+        theme: 'cosmos',
+        terminalFontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
+        terminalLineHeight: 1.5,
+        poster: 'npt:0.3',
+      });
+      // Start once the terminal is fully on screen. Geometry comes from each
+      // entry, so late player resizing can't skew the decision; if the terminal
+      // is taller than the viewport, settle for the largest reachable share.
+      observer = new IntersectionObserver(
+        entries => {
+          for (const entry of entries) {
+            const height = entry.boundingClientRect.height || 1;
+            const viewport = entry.rootBounds?.height ?? window.innerHeight;
+            const needed = Math.min(0.95, (viewport * 0.9) / height);
+            if (entry.intersectionRatio >= needed) {
+              player?.play();
+              observer?.disconnect();
+              break;
+            }
+          }
+        },
+        { threshold: [0, 0.25, 0.5, 0.65, 0.8, 0.9, 0.95, 1] },
+      );
+      observer.observe(node);
+    });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      observer?.disconnect();
+      player?.dispose();
+    };
+  }, []);
 
   return (
     <section className="hero" id="top">
@@ -66,24 +88,21 @@ export function Hero() {
             {ICONS.github}<span>Star on GitHub</span>
           </a>
         </div>
+      </div>
 
-        <div className="terminal" role="img" aria-label="Terminal showing make run KERNEL=HelloWorld booting in QEMU">
+      <div className="container">
+        <div className="terminal">
           <div className="term-bar">
             <span className="term-dot" style={{ background: '#FF6B6B' }} />
             <span className="term-dot" style={{ background: '#FFB454' }} />
             <span className="term-dot" style={{ background: '#3DDC84' }} />
-            <span className="term-title">cosmos@gen3 — qemu</span>
+            <span className="term-title">cosmos@gen3 — make run KERNEL=HelloWorld</span>
           </div>
-          <div className="term-body">
-            {shown.map((line, idx) => (
-              <div key={idx} className={`term-line term-${line.t}`}>
-                {line.t === 'cmd' && <span className="term-prompt">$</span>}
-                {line.t === 'cursor'
-                  ? <span className="term-prompt">$<span className="term-caret" /></span>
-                  : <span>{line.text}</span>}
-              </div>
-            ))}
-          </div>
+          <div
+            className="term-player"
+            ref={playerRef}
+            aria-label="Recording of make run KERNEL=HelloWorld building the kernel and booting it in QEMU"
+          />
         </div>
       </div>
     </section>

@@ -149,9 +149,9 @@ img { display: block; max-width: 100%; }
   margin-bottom: 64px;
 }
 
-/* Hero terminal */
+/* Hero terminal — full container width, same as the section grids */
 .terminal {
-  max-width: 800px; margin: 0 auto;
+  margin: 0 auto;
   background: #0B0B11; border: 1px solid var(--border-1); border-radius: 14px;
   overflow: hidden; text-align: left;
   box-shadow: var(--shadow-lg);
@@ -164,24 +164,34 @@ img { display: block; max-width: 100%; }
 }
 .term-dot { width: 11px; height: 11px; border-radius: 50%; }
 .term-title { margin-left: 12px; font-family: var(--font-mono); font-size: 11px; color: #6E6E85; }
-.term-body {
-  padding: 16px 18px;
-  font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
-  min-height: 240px;
-  color: #A0A0B5;
+.term-player { padding: 0; }
+/* Asciinema player, restyled to sit inside the hero terminal frame. */
+.term-player .ap-wrapper { background: transparent; }
+.term-player .ap-player { border-radius: 0; }
+/* Playback starts via IntersectionObserver — hide the big start overlay.
+   Doubled class beats the player's own `.ap-player .ap-overlay { display: flex }`,
+   which has equal specificity and loads after this file in the bundle. */
+.term-player .ap-overlay.ap-overlay-start { display: none; }
+.asciinema-player-theme-cosmos {
+  --term-color-background: transparent;
+  --term-color-foreground: #E8E8F2;
+  --term-color-0: #14141C;
+  --term-color-1: #FF6B6B;
+  --term-color-2: #3DDC84;
+  --term-color-3: #FFB454;
+  --term-color-4: #6CA4F8;
+  --term-color-5: #C792EA;
+  --term-color-6: #4DD0E1;
+  --term-color-7: #C8C8D8;
+  --term-color-8: #6E6E85;
+  --term-color-9: #FF8A8A;
+  --term-color-10: #6EE7A0;
+  --term-color-11: #FFC97A;
+  --term-color-12: #8FBCFF;
+  --term-color-13: #D9B3F5;
+  --term-color-14: #7DE3EF;
+  --term-color-15: #F5F5FA;
 }
-.term-line { display: flex; gap: 8px; }
-.term-cmd { color: #F5F5FA; }
-.term-prompt { color: var(--fg-4); user-select: none; flex-shrink: 0; }
-.term-log { color: #6E6E85; }
-.term-boot { color: var(--halo, #F2EBDA); }
-.term-k { color: #F5F5FA; }
-.term-caret {
-  display: inline-block; width: 7px; height: 14px; margin-left: 4px;
-  background: #F5F5FA; vertical-align: text-bottom;
-  animation: caret 1.05s steps(2, end) infinite;
-}
-@keyframes caret { 50% { opacity: 0; } }
 
 /* ============================================================
    Sections
@@ -290,131 +300,12 @@ img { display: block; max-width: 100%; }
 .era-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); margin: 0; max-width: 580px; }
 
 /* ============================================================
-   Snippet (getting started)
-   ============================================================ */
-.snippet {
-  background: #0B0B11; border: 1px solid var(--border-1); border-radius: 14px;
-  overflow: hidden;
-}
-[data-theme='light'] .snippet { background: #1A1A24; }
-.snippet-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-1);
-  background: rgba(255, 255, 255, 0.02);
-}
-.snippet-lang { font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); letter-spacing: 0.06em; text-transform: uppercase; }
-.snippet-copy {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 10px; border-radius: 6px;
-  background: transparent; color: var(--fg-2); border: 1px solid var(--border-1);
-  font-family: var(--font-sans); font-size: 12px; cursor: pointer;
-  transition: all var(--dur-fast);
-}
-.snippet-copy:hover { color: var(--fg-1); border-color: var(--border-2); }
-.snippet-copy svg { width: 13px; height: 13px; }
-.snippet-body {
-  margin: 0; padding: 20px 22px;
-  font-family: var(--font-mono); font-size: 14px; line-height: 1.85;
-  color: #F5F5FA;
-  white-space: pre-wrap; word-break: break-all;
-}
-.tok-prompt { color: var(--fg-4); user-select: none; }
-.tok-cmd { color: var(--halo, #F2EBDA); font-weight: 600; }
-.tok-arg { color: var(--fg-1); }
-.tok-val { color: var(--fg-1); font-weight: 500; }
-
-.docs-link { text-align: center; margin-top: 32px; }
-.docs-link a {
-  display: inline-flex; align-items: center; gap: 8px;
-  color: var(--fg-2); font-size: 14px;
-  border-bottom: 1px solid transparent;
-  transition: all var(--dur-fast);
-  padding-bottom: 2px;
-}
-.docs-link a:hover { color: var(--fg-1); border-bottom-color: var(--border-2); }
-.docs-link svg { width: 14px; height: 14px; }
-
-/* ============================================================
-   Projects (carousel of examples)
-   ============================================================ */
-.carousel {
-  position: relative;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.carousel-viewport {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-1);
-  border-radius: 14px;
-  background: var(--bg-2);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
-}
-.carousel-zone {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 50%;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  z-index: 2;
-}
-.carousel-zone:focus-visible {
-  outline: 2px solid var(--accent-line);
-  outline-offset: -4px;
-}
-.carousel-zone-prev { left: 0; }
-.carousel-zone-next { right: 0; }
-.carousel-track {
-  display: flex;
-  transition: transform var(--dur-slow) var(--ease-out);
-  will-change: transform;
-}
-.carousel-slide {
-  flex: 0 0 100%;
-  min-width: 0;
-  position: relative;
-  aspect-ratio: 16 / 9;
-  background: var(--bg-3);
-  overflow: hidden;
-}
-.carousel-slide img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-.carousel-dots {
-  display: flex; justify-content: center; gap: 8px;
-  margin-top: 16px;
-}
-.carousel-dot {
-  width: 8px; height: 8px; border-radius: 999px;
-  background: transparent;
-  border: 1px solid var(--border-2);
-  padding: 0; cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-inout);
-}
-.carousel-dot:hover { border-color: var(--accent-line); }
-.carousel-dot.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  width: 22px;
-}
-.carousel-dot:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-dim);
-}
-
-/* ============================================================
    Contributors
    ============================================================ */
 .avatar-wall {
-  display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px; max-width: 720px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(14, 1fr); gap: 12px;
 }
+@media (max-width: 1024px) { .avatar-wall { grid-template-columns: repeat(10, 1fr); } }
 @media (max-width: 720px) { .avatar-wall { grid-template-columns: repeat(6, 1fr); } }
 .avatar {
   position: relative;

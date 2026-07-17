@@ -12,7 +12,6 @@ export function Nav() {
         <nav className="nav-links">
           <a href="#features">Features</a>
           <a href="#timeline">History</a>
-          <a href="#start">Get started</a>
           <a href="#community">Community</a>
         </nav>
         <div className="nav-actions">

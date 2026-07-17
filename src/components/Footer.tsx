@@ -11,7 +11,6 @@ export function Footer() {
             <h4>Project</h4>
             <a href="#features">Features</a>
             <a href="#timeline">History</a>
-            <a href="#start">Getting started</a>
           </div>
           <div>
             <h4>Community</h4>
