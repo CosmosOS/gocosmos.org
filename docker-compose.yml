@@ -1,9 +1,10 @@
 services:
   dev-valentin-bzh:
-    image: php:8.2-apache
+    build:
+      context: .
+      network: host
     container_name: dev-valentin-bzh
     volumes:
-      - ./html:/var/www/html
       - ./logs:/var/log/app
     networks:
       - dev-valentin-bzh

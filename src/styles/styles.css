@@ -109,7 +109,7 @@ img { display: block; max-width: 100%; }
 .hero {
   position: relative;
   padding: 80px 0 96px;
-  overflow: hidden;
+  /* No overflow clip: .hero-glow must extend above the section, behind the nav */
   isolation: isolate;
 }
 .hero-glow {
