@@ -1,10 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 import { ICONS } from '../icons';
 
+/** Shown until the GitHub API answers (and if it never does). */
+const FALLBACK_VERSION = 'v3.0.79';
+
 export function Hero() {
   const playerRef = useRef<HTMLDivElement>(null);
+  const [version, setVersion] = useState(FALLBACK_VERSION);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('https://api.github.com/repos/valentinbreiz/nativeaot-patcher/releases/latest')
+      .then(r => (r.ok ? r.json() : null) as Promise<{ tag_name?: string } | null>)
+      .then(release => {
+        if (!cancelled && release?.tag_name) setVersion(release.tag_name);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const node = playerRef.current;
@@ -72,7 +87,7 @@ export function Hero() {
       <div className="hero-inner">
         <div className="hero-eyebrow">
           <span className="gen-pill">GEN3</span>
-          <span>NativeAOT release · v3.0.54</span>
+          <span>NativeAOT release · {version}</span>
         </div>
         <h1 className="hero-title">
           Write an OS in <span className="hero-accent">modern&nbsp;C#</span>.<br />
@@ -85,6 +100,9 @@ export function Hero() {
         <div className="hero-ctas">
           <a className="btn btn-primary btn-lg" href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">
             <span>Get started</span>{ICONS.arrow}
+          </a>
+          <a className="btn btn-secondary btn-lg" href="https://discord.com/invite/kwtBwv6jhD" target="_blank" rel="noreferrer">
+            {ICONS.msg}<span>Join community</span>
           </a>
           <a className="btn btn-secondary btn-lg" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
             {ICONS.github}<span>Star on GitHub</span>

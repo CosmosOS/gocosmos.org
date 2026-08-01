@@ -12,7 +12,7 @@ const LINKS: CommunityLink[] = [
   { icon: 'bug', title: 'Issues', desc: 'Bug reports and feature requests.', href: 'https://github.com/valentinbreiz/nativeaot-patcher/issues' },
   { icon: 'list', title: 'Priority board', desc: 'What we’re working on, in what order.', href: 'https://github.com/users/valentinbreiz/projects/2/views/2' },
   { icon: 'book', title: 'Documentation', desc: 'Install, build, plugs, GC, testing.', href: 'https://valentinbreiz.github.io/nativeaot-patcher/index.html' },
-  { icon: 'msg', title: 'Discord', desc: 'Chat with the team and other kernel devs.', href: '#' },
+  { icon: 'msg', title: 'Discord', desc: 'Chat with the team and other kernel devs.', href: 'https://discord.com/invite/kwtBwv6jhD' },
 ];
 
 export function Community() {
