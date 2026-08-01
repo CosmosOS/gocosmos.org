@@ -2,6 +2,7 @@ import './styles/colors_and_type.css';
 import './styles/styles.css';
 
 import { useReveal } from './hooks/useReveal';
+import { useGlassGlare } from './hooks/useGlassGlare';
 import { Starfield } from './components/Starfield';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
@@ -13,6 +14,7 @@ import { Footer } from './components/Footer';
 
 export function App() {
   useReveal();
+  useGlassGlare();
   return (
     <>
       <Starfield />

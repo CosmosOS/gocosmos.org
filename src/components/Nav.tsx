@@ -5,7 +5,7 @@ export function Nav() {
   const [theme, setTheme] = useTheme();
   return (
     <header className="nav">
-      <div className="nav-inner">
+      <div className="nav-inner glass">
         <a className="nav-brand" href="#top">
           <img src="/assets/cosmos-logo.png" alt="Cosmos" />
         </a>
@@ -21,7 +21,7 @@ export function Nav() {
             <span className="icon-sun">{ICONS.sun}</span>
             <span className="icon-moon">{ICONS.moon}</span>
           </button>
-          <a className="btn btn-secondary" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
+          <a className="btn btn-secondary glass" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
             {ICONS.github}<span>GitHub</span>
           </a>
           <a className="btn btn-primary" href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">

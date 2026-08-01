@@ -28,8 +28,8 @@ export function Features() {
         </div>
         <div className="feature-grid">
           {FEATURES.map((f, i) => (
-            <div key={f.title} className="feature-card" data-reveal style={{ transitionDelay: `${(i % 4) * 60}ms` }}>
-              <div className="feature-icon">{ICONS[f.icon]}</div>
+            <div key={f.title} className="feature-card glass" data-reveal style={{ transitionDelay: `${(i % 4) * 60}ms` }}>
+              <div className="feature-icon glass">{ICONS[f.icon]}</div>
               <h3 className="feature-title">{f.title}</h3>
               <p className="feature-desc">{f.desc}</p>
             </div>

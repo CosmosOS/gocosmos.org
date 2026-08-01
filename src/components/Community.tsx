@@ -26,7 +26,7 @@ export function Community() {
         </div>
         <div className="link-grid">
           {LINKS.map(l => (
-            <a key={l.title} className="link-card" href={l.href} target="_blank" rel="noreferrer" data-reveal>
+            <a key={l.title} className="link-card glass" href={l.href} target="_blank" rel="noreferrer" data-reveal>
               <div className="link-icon">{ICONS[l.icon]}</div>
               <div className="link-text">
                 <h3>{l.title}</h3>

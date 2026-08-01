@@ -50,7 +50,7 @@ export function Timeline() {
               </div>
               <div className="era-body">
                 <div className="era-meta">
-                  <span className={`era-tag ${era.current ? 'era-tag-current' : ''}`}>{era.tag}</span>
+                  <span className={`era-tag ${era.current ? 'era-tag-current glass' : ''}`}>{era.tag}</span>
                   <span className="era-year">{era.year}</span>
                 </div>
                 <h3 className={`era-title ${era.accent === 'gradient' ? 'hero-accent' : ''}`}>{era.title}</h3>

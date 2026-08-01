@@ -85,12 +85,12 @@ export function Hero() {
     <section className="hero" id="top">
       <div className="hero-glow" aria-hidden="true" />
       <div className="hero-inner">
-        <div className="hero-eyebrow">
-          <span className="gen-pill">GEN3</span>
+        <div className="hero-eyebrow glass">
+          <span className="gen-pill glass">GEN3</span>
           <span>NativeAOT release · {version}</span>
         </div>
         <h1 className="hero-title">
-          Write an OS in <span className="hero-accent">modern&nbsp;C#</span>.<br />
+          Write an OS in <span className="hero-accent glass">modern&nbsp;C#</span>.<br />
           Compiled ahead-of-time.<br />
           Runs on every hardware.
         </h1>
@@ -101,10 +101,10 @@ export function Hero() {
           <a className="btn btn-primary btn-lg" href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">
             <span>Get started</span>{ICONS.arrow}
           </a>
-          <a className="btn btn-secondary btn-lg" href="https://discord.com/invite/kwtBwv6jhD" target="_blank" rel="noreferrer">
+          <a className="btn btn-secondary btn-lg glass" href="https://discord.com/invite/kwtBwv6jhD" target="_blank" rel="noreferrer">
             {ICONS.msg}<span>Join community</span>
           </a>
-          <a className="btn btn-secondary btn-lg" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
+          <a className="btn btn-secondary btn-lg glass" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
             {ICONS.github}<span>Star on GitHub</span>
           </a>
         </div>
