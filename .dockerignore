@@ -1,0 +1,7 @@
+node_modules
+html
+logs
+.git
+Dockerfile
+docker-compose.yml
+dist-ssr

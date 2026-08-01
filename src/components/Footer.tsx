@@ -1,10 +1,9 @@
-/* global React */
-function Footer() {
+export function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner">
         <div className="footer-brand">
-          <img src="assets/cosmos-logo.png" alt="Cosmos" />
+          <img src="/assets/cosmos-logo.png" alt="Cosmos" />
           <p className="footer-tagline">Made with C# on bare metal.</p>
         </div>
         <div className="footer-cols">
@@ -12,7 +11,6 @@ function Footer() {
             <h4>Project</h4>
             <a href="#features">Features</a>
             <a href="#timeline">History</a>
-            <a href="#start">Getting started</a>
           </div>
           <div>
             <h4>Community</h4>
@@ -35,4 +33,3 @@ function Footer() {
     </footer>
   );
 }
-window.Footer = Footer;

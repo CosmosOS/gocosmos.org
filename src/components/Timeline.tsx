@@ -1,5 +1,13 @@
-/* global React */
-const ERAS = [
+interface Era {
+  tag: string;
+  year: string;
+  title: string;
+  body: string;
+  accent: 'fg-3' | 'gradient';
+  current?: boolean;
+}
+
+const ERAS: Era[] = [
   {
     tag: 'Gen1',
     year: '2007',
@@ -11,20 +19,20 @@ const ERAS = [
     tag: 'Gen2',
     year: '2010s — 2024',
     title: 'IL2CPU era.',
-    body: "A custom IL-to-x86 compiler — built and maintained by the community for over a decade. IL2CPU translated .NET bytecode straight to assembly, and powered hobby OSes for years.",
+    body: "A custom IL-to-x86 compiler, built and maintained by the community for over a decade. IL2CPU translated .NET bytecode straight to assembly, and powered hobby OSes for years.",
     accent: 'fg-3',
   },
   {
     tag: 'Gen3',
     year: 'Today',
     title: 'NativeAOT.',
-    body: "We retired 15 years of custom compiler work and stood on the shoulders of NativeAOT. Cosmos now patches .NET's official AOT pipeline at the IL level — modern language features, faster builds, less code to maintain.",
+    body: "We retired 15 years of custom compiler work and stood on the shoulders of NativeAOT. Cosmos now patches .NET's official AOT pipeline at the IL level, modern language features, faster builds, less code to maintain.",
     accent: 'gradient',
     current: true,
   },
 ];
 
-function Timeline() {
+export function Timeline() {
   return (
     <section className="section section-tinted" id="timeline">
       <div className="container">
@@ -42,7 +50,7 @@ function Timeline() {
               </div>
               <div className="era-body">
                 <div className="era-meta">
-                  <span className={`era-tag ${era.current ? 'era-tag-current' : ''}`}>{era.tag}</span>
+                  <span className={`era-tag ${era.current ? 'era-tag-current glass' : ''}`}>{era.tag}</span>
                   <span className="era-year">{era.year}</span>
                 </div>
                 <h3 className={`era-title ${era.accent === 'gradient' ? 'hero-accent' : ''}`}>{era.title}</h3>
@@ -55,4 +63,3 @@ function Timeline() {
     </section>
   );
 }
-window.Timeline = Timeline;

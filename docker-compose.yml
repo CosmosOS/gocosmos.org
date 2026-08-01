@@ -1,14 +1,16 @@
-version: '3.8'
 services:
   dev-valentin-bzh:
-    image: php:8.2-apache
+    build:
+      context: .
+      network: host
     container_name: dev-valentin-bzh
     volumes:
-      - ./html:/var/www/html
       - ./logs:/var/log/app
     networks:
       - dev-valentin-bzh
     restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.5
 
 networks:
   dev-valentin-bzh:

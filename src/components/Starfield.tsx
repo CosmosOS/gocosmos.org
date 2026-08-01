@@ -1,5 +1,66 @@
-/* global React */
-const { useEffect, useRef } = React;
+import { useEffect, useRef } from 'react';
+
+type RGB = readonly [number, number, number];
+
+interface Star {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  vx: number;
+  vy: number;
+  tw: number;
+  twSpeed: number;
+  sprite: HTMLCanvasElement;
+}
+
+interface Layer {
+  stars: Star[];
+  parallax: number;
+}
+
+interface Nebula {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  color: RGB;
+  a: number;
+  vx: number;
+  vy: number;
+  t: number;
+  bmp?: HTMLCanvasElement;
+}
+
+interface Galaxy {
+  cx: number;
+  cy: number;
+  r: number;
+  rot: number;
+  bmp?: HTMLCanvasElement;
+}
+
+interface ShootingStar {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  max: number;
+}
+
+const COLORS = {
+  cream:    [242, 235, 218],
+  iceBlue:  [180, 200, 230],
+  white:    [245, 245, 250],
+  nebulaA:  [120, 95, 180],   // muted violet
+  nebulaB:  [70, 130, 180],   // muted teal
+  galaxyHi: [242, 235, 218],
+} satisfies Record<string, RGB>;
+
+function rgba(c: RGB, a: number): string {
+  return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+}
 
 /**
  * Cosmos — animated background.
@@ -11,36 +72,54 @@ const { useEffect, useRef } = React;
  * Palette: cream halo + cool blue-white, lifted from the logo.
  * Respects prefers-reduced-motion (renders one static frame, no rAF).
  */
-function Starfield() {
-  const ref = useRef(null);
+export function Starfield() {
+  const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
-    let raf, w, h;
-    let layers = [];           // [{stars: [...]}]
-    let nebulae = [];          // soft drifting clouds
-    let galaxy = null;         // single rotating disc
-    let shooting = null;       // active shooting star
+    if (!ctx) return;
+    let raf = 0;
+    let w = 0;
+    let h = 0;
+    let layers: Layer[] = [];
+    let nebulae: Nebula[] = [];
+    let galaxy: Galaxy | null = null;
+    let shooting: ShootingStar | null = null;
     let nextShooting = 0;
     let mouseX = 0, mouseY = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const COLORS = {
-      cream:    [242, 235, 218],
-      iceBlue:  [180, 200, 230],
-      white:    [245, 245, 250],
-      nebulaA:  [120, 95, 180],   // muted violet
-      nebulaB:  [70, 130, 180],   // muted teal
-      galaxyHi: [242, 235, 218],
+    // Everything static is rasterized once and drawImage'd per frame —
+    // per-frame gradient allocation + path rasterization for ~600 shapes was
+    // the main CPU cost of this component. Star/galaxy output is identical.
+    // Nebulae: the old per-frame version evaluated its gradient under the
+    // ellipse transform, which offset the glow by (x·rx/R, y·ry/R) — leaving
+    // the teal nebula fully transparent. The baked version centers the glow
+    // in its ellipse, i.e. what the layer list above always described.
+    function makeStarSprite(c: RGB): HTMLCanvasElement {
+      const s = document.createElement('canvas');
+      const R = 8;
+      s.width = s.height = R * 2;
+      const g = s.getContext('2d');
+      if (g) {
+        g.fillStyle = rgba(c, 1);
+        g.beginPath();
+        g.arc(R, R, R, 0, Math.PI * 2);
+        g.fill();
+      }
+      return s;
+    }
+    const SPRITES = {
+      white: makeStarSprite(COLORS.white),
+      cream: makeStarSprite(COLORS.cream),
+      iceBlue: makeStarSprite(COLORS.iceBlue),
     };
 
-    function rgba(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
-
-    function makeLayer(density, sizeMin, sizeMax, speedMul, parallax) {
+    function makeLayer(density: number, sizeMin: number, sizeMax: number, speedMul: number, parallax: number): Layer {
       const count = Math.floor((w * h) / density);
-      const stars = [];
+      const stars: Star[] = [];
       for (let i = 0; i < count; i++) {
         const tint = Math.random();
         stars.push({
@@ -52,13 +131,65 @@ function Starfield() {
           vy: (Math.random() - 0.5) * 0.02 * speedMul,
           tw: Math.random() * Math.PI * 2,
           twSpeed: 0.004 + Math.random() * 0.012,
-          color: tint < 0.7 ? COLORS.white : (tint < 0.9 ? COLORS.cream : COLORS.iceBlue),
+          sprite: tint < 0.7 ? SPRITES.white : (tint < 0.9 ? SPRITES.cream : SPRITES.iceBlue),
         });
       }
       return { stars, parallax };
     }
 
+    // Bake a nebula's gradient once (at half resolution — it's a soft blur by
+    // nature, the upscale is invisible and saves memory).
+    function bakeNebula(n: Nebula) {
+      const R = Math.max(n.rx, n.ry);
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.ceil(n.rx));
+      c.height = Math.max(1, Math.ceil(n.ry));
+      const g = c.getContext('2d');
+      if (!g) return;
+      const grd = g.createRadialGradient(0, 0, 0, 0, 0, R);
+      grd.addColorStop(0, rgba(n.color, n.a));
+      grd.addColorStop(0.55, rgba(n.color, n.a * 0.35));
+      grd.addColorStop(1, rgba(n.color, 0));
+      g.scale(0.5, 0.5);
+      g.translate(n.rx, n.ry);
+      g.scale(n.rx / R, n.ry / R);
+      g.fillStyle = grd;
+      g.beginPath();
+      g.arc(0, 0, R, 0, Math.PI * 2);
+      g.fill();
+      n.bmp = c;
+    }
+
+    function bakeGalaxy(gal: Galaxy) {
+      const r = gal.r;
+      const c = document.createElement('canvas');
+      c.width = c.height = Math.max(1, Math.ceil(r * 2 * dpr));
+      const g = c.getContext('2d');
+      if (!g) return;
+      g.scale(dpr, dpr);
+      g.translate(r, r);
+      const grd = g.createRadialGradient(0, 0, 0, 0, 0, r);
+      grd.addColorStop(0, rgba(COLORS.galaxyHi, 0.18));
+      grd.addColorStop(0.25, rgba(COLORS.galaxyHi, 0.08));
+      grd.addColorStop(0.6, rgba(COLORS.nebulaA, 0.05));
+      grd.addColorStop(1, rgba(COLORS.nebulaA, 0));
+      g.fillStyle = grd;
+      g.save();
+      g.scale(1, 0.32); // flat disc
+      g.beginPath();
+      g.arc(0, 0, r, 0, Math.PI * 2);
+      g.fill();
+      // Bright core — inside the same flatten transform, like the disc.
+      g.fillStyle = rgba(COLORS.galaxyHi, 0.30);
+      g.beginPath();
+      g.arc(0, 0, r * 0.10, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+      gal.bmp = c;
+    }
+
     function resize() {
+      if (!canvas || !ctx) return;
       w = canvas.clientWidth; h = canvas.clientHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -75,12 +206,15 @@ function Starfield() {
         { x: w * 0.25, y: h * 0.30, rx: w * 0.45, ry: h * 0.35, color: COLORS.nebulaA, a: 0.10, vx: 0.015, vy: 0.008, t: 0 },
         { x: w * 0.78, y: h * 0.65, rx: w * 0.38, ry: h * 0.30, color: COLORS.nebulaB, a: 0.08, vx: -0.012, vy: -0.006, t: Math.PI },
       ];
+      nebulae.forEach(bakeNebula);
 
       // Single rotating galaxy disc, top-right region
       galaxy = { cx: w * 0.78, cy: h * 0.22, r: Math.min(w, h) * 0.14, rot: 0 };
+      bakeGalaxy(galaxy);
     }
 
-    function drawNebula(n) {
+    function drawNebula(n: Nebula) {
+      if (!ctx || !n.bmp) return;
       // Slow drift + breathing alpha so it doesn't look static
       n.t += 0.002;
       n.x += n.vx; n.y += n.vy;
@@ -89,47 +223,23 @@ function Starfield() {
       if (n.x > w + n.rx) n.x = -n.rx;
       if (n.y < -n.ry) n.y = h + n.ry;
       if (n.y > h + n.ry) n.y = -n.ry;
-      const breathe = 0.85 + Math.sin(n.t) * 0.15;
-      const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, Math.max(n.rx, n.ry));
-      grd.addColorStop(0,    rgba(n.color, n.a * breathe));
-      grd.addColorStop(0.55, rgba(n.color, n.a * 0.35 * breathe));
-      grd.addColorStop(1,    rgba(n.color, 0));
-      ctx.fillStyle = grd;
-      ctx.save();
-      ctx.translate(n.x, n.y);
-      ctx.scale(n.rx / Math.max(n.rx, n.ry), n.ry / Math.max(n.rx, n.ry));
-      ctx.beginPath();
-      ctx.arc(0, 0, Math.max(n.rx, n.ry), 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      ctx.globalAlpha = 0.85 + Math.sin(n.t) * 0.15;
+      ctx.drawImage(n.bmp, n.x - n.rx, n.y - n.ry, n.rx * 2, n.ry * 2);
+      ctx.globalAlpha = 1;
     }
 
     function drawGalaxy() {
+      if (!ctx || !galaxy || !galaxy.bmp) return;
       galaxy.rot += 0.0008;
       ctx.save();
       ctx.translate(galaxy.cx, galaxy.cy);
       ctx.rotate(galaxy.rot);
-      // Disc — flattened oval glow
-      const r = galaxy.r;
-      const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      grd.addColorStop(0,    rgba(COLORS.galaxyHi, 0.18));
-      grd.addColorStop(0.25, rgba(COLORS.galaxyHi, 0.08));
-      grd.addColorStop(0.6,  rgba(COLORS.nebulaA, 0.05));
-      grd.addColorStop(1,    rgba(COLORS.nebulaA, 0));
-      ctx.fillStyle = grd;
-      ctx.scale(1, 0.32); // flat disc
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.fill();
-      // Bright core
-      ctx.fillStyle = rgba(COLORS.galaxyHi, 0.30);
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.10, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.drawImage(galaxy.bmp, -galaxy.r, -galaxy.r, galaxy.r * 2, galaxy.r * 2);
       ctx.restore();
     }
 
-    function drawStars(t) {
+    function drawStars() {
+      if (!ctx) return;
       // Mouse parallax target (smoothly lerped via mouseX/mouseY which are -1..1)
       for (const layer of layers) {
         const ox = mouseX * layer.parallax;
@@ -139,22 +249,20 @@ function Starfield() {
           if (s.x < 0) s.x = w; else if (s.x > w) s.x = 0;
           if (s.y < 0) s.y = h; else if (s.y > h) s.y = 0;
           const a = s.a * (0.55 + Math.sin(s.tw) * 0.45);
-          ctx.fillStyle = rgba(s.color, a);
-          ctx.beginPath();
-          ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.globalAlpha = a;
+          ctx.drawImage(s.sprite, s.x + ox - s.r, s.y + oy - s.r, s.r * 2, s.r * 2);
           // Glow halo on the bigger near-layer stars
           if (s.r > 1.3) {
-            ctx.fillStyle = rgba(s.color, a * 0.18);
-            ctx.beginPath();
-            ctx.arc(s.x + ox, s.y + oy, s.r * 2.6, 0, Math.PI * 2);
-            ctx.fill();
+            const hr = s.r * 2.6;
+            ctx.globalAlpha = a * 0.18;
+            ctx.drawImage(s.sprite, s.x + ox - hr, s.y + oy - hr, hr * 2, hr * 2);
           }
         }
       }
+      ctx.globalAlpha = 1;
     }
 
-    function spawnShootingStar(t) {
+    function spawnShootingStar() {
       // Random angle that sweeps top-left → bottom-right area, gentle
       const fromLeft = Math.random() < 0.5;
       const startX = fromLeft ? -40 : w + 40;
@@ -172,7 +280,7 @@ function Starfield() {
     }
 
     function drawShooting() {
-      if (!shooting) return;
+      if (!ctx || !shooting) return;
       shooting.life++;
       shooting.x += shooting.vx;
       shooting.y += shooting.vy;
@@ -210,7 +318,8 @@ function Starfield() {
     }
 
     let smoothMx = 0, smoothMy = 0;
-    function tick(t) {
+    function tick(t: number) {
+      if (!ctx) return;
       ctx.clearRect(0, 0, w, h);
       // Smoothly approach target mouse offset
       smoothMx += (mouseX - smoothMx) * 0.04;
@@ -221,18 +330,19 @@ function Starfield() {
       // Stars (use smoothed values)
       const realMx = mouseX, realMy = mouseY;
       mouseX = smoothMx; mouseY = smoothMy;
-      drawStars(t);
+      drawStars();
       mouseX = realMx; mouseY = realMy;
       // Shooting star
       if (!shooting && t > nextShooting) {
-        spawnShootingStar(t);
+        spawnShootingStar();
         nextShooting = t + 6000 + Math.random() * 5000;
       }
       drawShooting();
       raf = requestAnimationFrame(tick);
     }
 
-    function onMouse(e) {
+    function onMouse(e: MouseEvent) {
+      if (!canvas) return;
       const r = canvas.getBoundingClientRect();
       // Normalize to -1..1 around center
       mouseX = ((e.clientX - r.left) / r.width - 0.5) * 2;
@@ -244,7 +354,7 @@ function Starfield() {
       // Single static frame
       for (const n of nebulae) drawNebula(n);
       drawGalaxy();
-      drawStars(0);
+      drawStars();
     } else {
       nextShooting = performance.now() + 3000;
       raf = requestAnimationFrame(tick);
@@ -260,4 +370,3 @@ function Starfield() {
   }, []);
   return <canvas ref={ref} className="starfield" aria-hidden="true" />;
 }
-window.Starfield = Starfield;
