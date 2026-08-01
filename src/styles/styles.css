@@ -320,7 +320,6 @@ img { display: block; max-width: 100%; }
   width: 100%; height: 100%; border-radius: 50%;
   font-family: var(--font-mono); font-size: 11px; color: var(--fg-3);
 }
-.avatar-gen3 { border-color: var(--halo, #F2EBDA); }
 .avatar-badge {
   position: absolute; bottom: -2px; right: -2px;
   min-width: 18px; height: 16px; padding: 0 4px;

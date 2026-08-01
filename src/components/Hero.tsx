@@ -78,7 +78,7 @@ export function Hero() {
           Runs on every hardware.
         </h1>
         <p className="hero-sub">
-          Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on x64 or ARM64 — bare metal, no JIT, no managed runtime.
+          Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on x64 or ARM64, no JIT, no managed runtime.
         </p>
         <div className="hero-ctas">
           <a className="btn btn-primary btn-lg" href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">

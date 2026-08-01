@@ -22,7 +22,7 @@ export function Community() {
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// community &amp; links</div>
           <h2 className="cs-h1">Find us, file issues, jump in.</h2>
-          <p className="section-sub">Cosmos is open source and community-led. Pull requests welcome — start with the priority board.</p>
+          <p className="section-sub">Cosmos is open source and community-led. Pull requests welcome, start with the priority board.</p>
         </div>
         <div className="link-grid">
           {LINKS.map(l => (
