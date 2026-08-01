@@ -18,13 +18,18 @@ const spiralPath = (thetaOffset: number, turns: number, rOuter: number): string 
   return pts.join(' ');
 };
 const THIRD = (2 * Math.PI) / 3;
+/* Dash periods are all 13 or 26 units so the shared -26 dashoffset loop in
+   styles.css wraps seamlessly on every strand; per-strand flow speeds (fd)
+   and dash patterns make the tangle organic instead of mechanical. */
 const ARMS = [
-  { d: spiralPath(0, 1.25, 49), o: 0.70, w: 2.0 },
-  { d: spiralPath(THIRD, 1.25, 47), o: 0.48, w: 1.6 },
-  { d: spiralPath(2 * THIRD, 1.25, 48), o: 0.60, w: 1.8 },
-  { d: spiralPath(0.7, 1.4, 44), o: 0.30, w: 1.1 },
-  { d: spiralPath(0.7 + THIRD, 1.4, 43), o: 0.24, w: 1.1 },
-  { d: spiralPath(0.7 + 2 * THIRD, 1.4, 45), o: 0.27, w: 1.1 },
+  { d: spiralPath(0, 1.7, 49), o: 0.70, w: 2.0, da: '18 8', fd: '0.8s' },
+  { d: spiralPath(THIRD, 1.7, 46), o: 0.46, w: 1.6, da: '14 12', fd: '0.95s' },
+  { d: spiralPath(2 * THIRD, 1.7, 48), o: 0.58, w: 1.8, da: '16 10', fd: '0.72s' },
+  { d: spiralPath(0.9, 2.0, 43), o: 0.30, w: 1.2, da: '9 4', fd: '0.66s' },
+  { d: spiralPath(0.9 + THIRD, 2.0, 41), o: 0.24, w: 1.1, da: '11 2', fd: '1.05s' },
+  { d: spiralPath(0.9 + 2 * THIRD, 2.0, 44), o: 0.27, w: 1.2, da: '13 13', fd: '0.88s' },
+  { d: spiralPath(1.9, 1.45, 50), o: 0.36, w: 1.4, da: '20 6', fd: '0.78s' },
+  { d: spiralPath(1.9 + Math.PI, 1.45, 47), o: 0.32, w: 1.4, da: '17 9', fd: '0.92s' },
 ];
 
 /**
@@ -52,7 +57,8 @@ export function VortexLabel({ text }: { text: string }) {
             {ARMS.map((a, i) => (
               <path key={i} d={a.d} fill="none" stroke="#F2EBDA" strokeOpacity={a.o}
                 strokeWidth={a.w} strokeLinecap="round" className="vx-strand"
-                vectorEffect="non-scaling-stroke" />
+                vectorEffect="non-scaling-stroke"
+                style={{ strokeDasharray: a.da, animationDuration: a.fd }} />
             ))}
           </g>
         </svg>

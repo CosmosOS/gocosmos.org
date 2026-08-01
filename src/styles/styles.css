@@ -227,10 +227,24 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .vx-strand {
   stroke-dasharray: 16 10;
   animation: vx-flow 0.8s linear infinite;
+  /* Dash pattern and flow speed vary per strand via inline style. */
 }
 @keyframes vx-rot { to { transform: rotate(360deg); } }
-/* -26 = one full dash period (16+10), so the flow loops seamlessly. */
+/* -26 = one dash period (all per-strand patterns sum to 13 or 26), so the
+   flow loops seamlessly on every strand. */
 @keyframes vx-flow { to { stroke-dashoffset: -26; } }
+/* The swirl jolts on the same 2.7s clock as the horizon glitch and the
+   letter spaghettification: a hard rotational kick + flare (steps(), like
+   the background) at the exact moment the letters get dragged. Composes
+   with the continuous .vx-spin rotation through nesting. */
+.btn-primary .vx-swirl { animation: swirl-jolt 2.7s steps(1, end) infinite; }
+@keyframes swirl-jolt {
+  0%, 88.5% { transform: none; filter: none; }
+  89.5% { transform: rotate(-7deg) scale(1.07); filter: brightness(1.6); }
+  91% { transform: rotate(4deg) scale(0.95); filter: brightness(0.85); }
+  92.5% { transform: rotate(-2deg) scale(1.02); filter: brightness(1.25); }
+  94%, 100% { transform: none; filter: none; }
+}
 
 /* Click and hold: dive into the rabbit hole. Spin and inward flow snap ~4x
    faster, the deep rings rush (their loop is self-similar, so the phase
@@ -238,7 +252,8 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
    horizon — its glitch animation is lifted so the transform applies. */
 .btn-primary:active::before { animation-duration: 0.3s; opacity: 1; }
 .btn-primary:active .vx-spin { animation-duration: 0.7s; }
-.btn-primary:active .vx-strand { animation-duration: 0.22s; }
+/* !important: flow speed is otherwise set per strand via inline style. */
+.btn-primary:active .vx-strand { animation-duration: 0.22s !important; }
 .btn-primary:active > .vx-label {
   animation: none;
   transform: scale(0.88);
@@ -248,7 +263,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 @media (prefers-reduced-motion: reduce) {
   .btn-primary::before, .btn-primary::after,
   .btn-primary > .vx-label, .vx-label .vx-l,
-  .vx-spin, .vx-strand { animation: none !important; }
+  .vx-swirl, .vx-spin, .vx-strand { animation: none !important; }
 }
 /* Secondary buttons are glass surfaces (class set in markup). */
 .btn-secondary { color: var(--fg-1); }
