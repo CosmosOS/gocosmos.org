@@ -15,8 +15,11 @@ export function Nav() {
           <a href="#community">Community</a>
         </nav>
         <div className="nav-actions">
-          <button className="icon-btn" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            {theme === 'dark' ? ICONS.sun : ICONS.moon}
+          {/* Both icons are always in the markup and CSS picks one via [data-theme],
+              so the prerendered HTML matches on hydration whatever the stored theme. */}
+          <button className="icon-btn theme-toggle" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+            <span className="icon-sun">{ICONS.sun}</span>
+            <span className="icon-moon">{ICONS.moon}</span>
           </button>
           <a className="btn btn-secondary" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
             {ICONS.github}<span>GitHub</span>

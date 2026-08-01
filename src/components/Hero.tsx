@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import * as AsciinemaPlayer from 'asciinema-player';
+import type * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 import { ICONS } from '../icons';
 
@@ -16,15 +16,17 @@ export function Hero() {
 
     // The player sizes its type to fill the width by measuring glyphs at
     // creation time and never re-measures on font swap — so wait for the mono
-    // webfont (with a timeout fallback) before creating it.
+    // webfont (with a timeout fallback) before creating it. The player module
+    // itself is dynamically imported (it can't run during prerendering and
+    // this keeps it out of the main bundle); the fetch overlaps the font wait.
     const fontsReady = 'fonts' in document
       ? Promise.all([document.fonts.load("14px 'JetBrains Mono'"), document.fonts.ready]).catch(() => undefined)
       : Promise.resolve(undefined);
     const fallback = new Promise(resolve => { timer = window.setTimeout(resolve, 1500); });
 
-    Promise.race([fontsReady, fallback]).then(() => {
+    Promise.all([import('asciinema-player'), Promise.race([fontsReady, fallback])]).then(([{ create }]) => {
       if (cancelled) return;
-      player = AsciinemaPlayer.create('/assets/helloworld.cast', node, {
+      player = create('/assets/helloworld.cast', node, {
         cols: 100,
         rows: 20,
         preload: true,

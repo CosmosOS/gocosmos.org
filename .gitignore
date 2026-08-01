@@ -3,3 +3,6 @@ node_modules/
 html/
 logs/
 *.local
+
+# Throwaway SSR bundle used by scripts/prerender.mjs
+dist-ssr/
