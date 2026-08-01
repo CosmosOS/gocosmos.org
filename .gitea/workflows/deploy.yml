@@ -9,6 +9,10 @@ on:
 jobs:
   deploy:
     runs-on: deploy
+    # the docker:cli job image is alpine-based: sh, not bash
+    defaults:
+      run:
+        shell: sh
     steps:
       - name: Sync deploy clone and redeploy
         run: |

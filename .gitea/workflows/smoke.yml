@@ -4,6 +4,9 @@ on: push
 jobs:
   smoke:
     runs-on: deploy
+    defaults:
+      run:
+        shell: sh
     steps:
       - name: Verify runner plumbing
         run: |
