@@ -106,25 +106,127 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .btn svg { width: 16px; height: 16px; }
 .btn-lg { padding: 13px 22px; font-size: 15px; border-radius: 12px; }
 .btn-lg svg { width: 18px; height: 18px; }
+/* Primary buttons are a small black hole: a void base that darkens toward
+   the center, a slow swirl of cream light (the site accent, recycled as
+   accretion glow) and light text. Identical in both themes — the void does
+   not care what the page looks like. z-index: 0 makes the button a stacking
+   context so the z:-1 swirl paints above its background but under the label. */
 .btn-primary {
-  background: var(--accent, #F2EBDA); color: #1C1C20;
-  position: relative;
-  border-color: rgba(255, 255, 255, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 20px rgba(0,0,0,0.35);
+  position: relative; z-index: 0; overflow: hidden;
+  background: radial-gradient(90% 150% at 50% 50%, #030308 0%, #0A0A12 45%, #191922 100%);
+  color: var(--halo, #F2EBDA);
+  border-color: rgba(242, 235, 218, 0.30);
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(242, 235, 218, 0.10),
+    0 8px 20px rgba(0, 0, 0, 0.35);
 }
+/* The warp tunnel: rings spaced geometrically (each 1.6x the previous) on a
+   centered square, plus 3-fold spiral arms. One loop scales everything by
+   exactly 1.6 while rotating 120deg — ring N lands on ring N+1 and the arms
+   land on themselves, so the loop is seamless and reads as endlessly falling
+   into the pipe. Ring thickness also grows 1.6x per ring for self-similarity.
+   Compositor-only (transform), no per-frame paint. */
+.btn-primary::before {
+  content: ''; position: absolute; z-index: -1;
+  left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px;
+  /* Uniform ring alpha is REQUIRED for the seamless loop (ring N must look
+     exactly like ring N+1 after the 1.6x scale) — all tonal depth comes from
+     the static veils in ::after, which grade brightness by radius. */
+  background:
+    repeating-conic-gradient(from 0deg,
+      transparent 0deg, rgba(242, 235, 218, 0.10) 22deg, transparent 46deg, transparent 120deg),
+    radial-gradient(circle closest-side,
+      transparent 0% 4.4%, rgba(242, 235, 218, 0.42) 5%, transparent 5.8%,
+      transparent 7.4%, rgba(242, 235, 218, 0.42) 8%, transparent 8.9%,
+      transparent 12%, rgba(242, 235, 218, 0.42) 12.8%, transparent 14.2%,
+      transparent 19.2%, rgba(242, 235, 218, 0.42) 20.5%, transparent 22.7%,
+      transparent 30.7%, rgba(242, 235, 218, 0.42) 32.8%, transparent 36.3%,
+      transparent 49.1%, rgba(242, 235, 218, 0.42) 52.5%, transparent 58.1%,
+      transparent 78.6%, rgba(242, 235, 218, 0.42) 84%, transparent 93%);
+  filter: blur(1px);
+  opacity: 0.9;
+  transform: scale(2.1, 1) rotate(0deg);
+  animation: warp-tunnel 1.1s linear infinite;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+@keyframes warp-tunnel { to { transform: scale(3.36, 1.6) rotate(120deg); } }
+/* Static above the tunnel (::after paints over ::before at equal z-index):
+   edge vignette that swallows the rings near the frame, a lensing flare and
+   the event horizon the label sits on. The horizon jerks sideways in hard
+   steps() snaps every few seconds — reality glitching around a stable label. */
 .btn-primary::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit;
-  background: var(--sheen, linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 38%, transparent 50%, rgba(255,255,255,0.03) 62%, transparent 100%)); pointer-events: none;
+  content: ''; position: absolute; inset: -3px; z-index: -1;
+  background:
+    radial-gradient(110% 145% at 50% 50%, transparent 48%, rgba(3, 3, 8, 0.28) 66%, rgba(3, 3, 8, 0.62) 80%, rgba(3, 3, 8, 0.92) 96%),
+    radial-gradient(40% 56% at 41% 50%, transparent 62%, rgba(255, 250, 240, 0.18) 73%, transparent 84%),
+    radial-gradient(42% 58% at 50% 50%, transparent 64%, rgba(242, 235, 218, 0.10) 76%, transparent 89%),
+    radial-gradient(38% 52% at 50% 50%, #000 0% 56%, rgba(0, 0, 0, 0.78) 71%, rgba(0, 0, 0, 0.35) 82%, transparent 92%);
+  animation: horizon-glitch 2.7s steps(1, end) infinite;
+  pointer-events: none;
 }
-[data-theme='light'] .btn-primary { background: var(--slate-0); color: var(--halo); border-color: rgba(255,255,255,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 20px rgba(0,0,0,0.22); }
+@keyframes horizon-glitch {
+  0%, 88% { transform: none; filter: none; }
+  89% { transform: translateX(-2.5px) skewX(-10deg); filter: brightness(1.7); }
+  90.5% { transform: translateX(2px) scaleY(1.09) skewX(6deg); filter: brightness(0.7); }
+  92% { transform: translateY(-1.5px) skewX(-4deg); filter: brightness(1.35); }
+  93.5%, 100% { transform: none; filter: none; }
+}
+/* The whole label feels the reality glitch: the VortexLabel wrapper gets the
+   same duration, keyframe offsets and hard steps() snaps as the horizon. */
+.btn-primary > .vx-label {
+  animation: label-warp 2.7s steps(1, end) infinite;
+}
+@keyframes label-warp {
+  0%, 88% { transform: none; filter: none; }
+  89% { transform: scale(0.94, 1.08) skewX(-5deg); filter: blur(0.6px) brightness(1.3); }
+  90.5% { transform: scale(1.06, 0.92) skewX(4deg) translateY(0.5px); filter: blur(0.4px); }
+  92% { transform: scale(0.99, 1.02) skewX(-1.5deg); filter: none; }
+  93.5%, 100% { transform: none; filter: none; }
+}
+/* Spaghettification, glitch-time only — the label is perfectly still the
+   rest of the cycle. Every glyph (VortexLabel renders one element per
+   character, plus the arrow) runs this 2.7s cycle, identity outside the
+   burst, with an inline ~20ms delay per position: when the glitch fires,
+   the pull whips through the text in the vortex's rotation direction.
+   Each glyph swings along the arc (translate + rotate) while stretching
+   radially (narrow + tall + blur = tidal stretching), overshoots back and
+   settles. Interpolated on purpose — the background snaps in steps() while
+   the text visibly STRETCHES, which is what sells the gravity. */
+.vx-label { display: inline-flex; align-items: center; }
+.vx-label .vx-l {
+  display: inline-flex; font-style: normal;
+  animation: letter-spaghetti 2.7s ease-in-out infinite;
+}
+.vx-label .vx-arrow { margin-left: 8px; }
+@keyframes letter-spaghetti {
+  0%, 88.5% { transform: none; filter: none; }
+  90% { transform: translate(-1.5px, 2.5px) rotate(-6deg) scale(0.92, 1.25); filter: blur(0.4px); }
+  91.5% { transform: translate(0.5px, 5px) rotate(-14deg) scale(0.82, 1.55); filter: blur(0.9px) brightness(1.25); }
+  93% { transform: translate(1px, -1.5px) rotate(4deg) scale(1.06, 0.9); filter: none; }
+  94.5%, 100% { transform: none; filter: none; }
+}
+/* Visually hidden plain text for screen readers (the glyph spans are
+   aria-hidden). */
+.vx-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary::before, .btn-primary::after,
+  .btn-primary > .vx-label, .vx-label .vx-l { animation: none !important; }
+}
 /* Secondary buttons are glass surfaces (class set in markup). */
 .btn-secondary { color: var(--fg-1); }
 /* All :hover rules gated on `hover: hover` — touch devices don't clear the
    hover state until another element is tapped, which left buttons stuck in
    their hover style after every tap on mobile. */
 @media (hover: hover) {
-  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-  [data-theme='light'] .btn-primary:hover { background: #2A2A30; }
+  /* Hover: the vortex brightens and the accretion rim sharpens — the void
+     base itself stays put (a background swap here would flash). */
+  .btn-primary:hover { transform: translateY(-1px); border-color: rgba(242, 235, 218, 0.55); }
+  .btn-primary:hover::before { opacity: 1; }
   .btn-secondary.glass:hover { border-color: rgba(255, 255, 255, 0.24); transform: translateY(-1px); }
   [data-theme='light'] .btn-secondary.glass:hover { border-color: rgba(20, 20, 35, 0.22); }
 }
@@ -178,6 +280,44 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .nav-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; height: 100%; }
 .nav-actions .btn { padding: 0 16px; height: 100%; font-size: 13px; border-radius: 999px; line-height: 1; }
 .nav-actions .icon-btn { height: 36px; width: 36px; border-radius: 999px; }
+/* Inside the pill the button's outer drop shadow has nowhere to fall: the
+   .nav-cta-inner clip cuts it 16px down, which reads as a hard seam on light
+   backgrounds. Keep only the inset void shading here. */
+.nav-actions .btn-primary {
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(242, 235, 218, 0.10);
+}
+/* The page's only "Get started" lives here, collapsed until the hero CTA row
+   scrolls away (Nav.tsx toggles .is-visible). Hidden only when JS runs — same
+   deal as [data-reveal] — so the prerendered page always has a reachable CTA.
+   visibility rides the transition so the collapsed button drops out of the
+   focus order and a11y tree without extra ARIA. */
+.nav-cta { height: 100%; display: grid; grid-template-columns: 1fr; }
+.nav-cta-inner {
+  display: flex; height: 100%; min-width: 0;
+  /* Clip the button as the column collapses; the margin spares its shadow. */
+  overflow: clip; overflow-clip-margin: 16px;
+}
+/* The two phases are sequenced so the clip edge never crosses a visible
+   button (that reads as the label getting cropped): fade happens only while
+   the column is at rest, the column only moves once the button is invisible. */
+html.js .nav-cta {
+  /* Showing: the slot opens in the pill first, then the button drops in. */
+  transition: grid-template-columns 420ms var(--ease-out), margin-left 420ms var(--ease-out),
+    opacity 300ms var(--ease-out) 240ms, transform 360ms var(--ease-out) 240ms, visibility 0s;
+}
+html.js .nav-cta:not(.is-visible) {
+  /* Hiding: fade out in place first, collapse the emptied slot after. */
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out),
+    grid-template-columns 420ms var(--ease-out) 220ms, margin-left 420ms var(--ease-out) 220ms,
+    visibility 0s 220ms;
+  grid-template-columns: 0fr;
+  margin-left: -6px; /* also swallow the nav-actions flex gap */
+  opacity: 0;
+  transform: translateY(-10px);
+  visibility: hidden;
+}
 @media (hover: hover) {
   .nav-links a:hover { color: var(--fg-1); }
   .nav-actions .btn-primary:hover { transform: none; }
@@ -186,9 +326,13 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 @media (max-width: 880px) {
   .nav { padding: 0 16px; }
   .nav-links { display: none; }
-  .nav-actions .btn span { display: none; }
+  .nav-actions .btn > span { display: none; }
   .nav-actions .btn svg { width: 16px; height: 16px; }
-  .nav-actions .btn-primary span { display: inline; }
+  /* The primary label is a VortexLabel, not a plain span: restore its flex
+     centering (`inline` would drop the glyphs onto the text baseline, which
+     shifts when the webfont swaps in) and keep its SR text in the tree. */
+  .nav-actions .btn-primary > .vx-label { display: inline-flex; }
+  .nav-actions .btn-primary > .vx-sr { display: inline; }
 }
 
 /* ============================================================
