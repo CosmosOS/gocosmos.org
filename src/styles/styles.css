@@ -262,7 +262,10 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
    Doubled class beats the player's own `.ap-player .ap-overlay { display: flex }`,
    which has equal specificity and loads after this file in the bundle. */
 .term-player .ap-overlay.ap-overlay-start { display: none; }
-.asciinema-player-theme-cosmos {
+/* Doubled class: the player's own CSS lands later in the bundle and resets
+   every slot to white via `.ap-player { --term-color-N: ... }` at the same
+   specificity — without the bump this whole palette silently never applies. */
+.asciinema-player-theme-cosmos.asciinema-player-theme-cosmos {
   --term-color-background: transparent;
   --term-color-foreground: #E8E8F2;
   --term-color-0: #14141C;
