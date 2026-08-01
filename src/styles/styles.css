@@ -134,16 +134,14 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
      exactly like ring N+1 after the 1.6x scale) — all tonal depth comes from
      the static veils in ::after, which grade brightness by radius. */
   background:
-    repeating-conic-gradient(from 0deg,
-      transparent 0deg, rgba(242, 235, 218, 0.10) 22deg, transparent 46deg, transparent 120deg),
     radial-gradient(circle closest-side,
-      transparent 0% 4.4%, rgba(242, 235, 218, 0.42) 5%, transparent 5.8%,
-      transparent 7.4%, rgba(242, 235, 218, 0.42) 8%, transparent 8.9%,
-      transparent 12%, rgba(242, 235, 218, 0.42) 12.8%, transparent 14.2%,
-      transparent 19.2%, rgba(242, 235, 218, 0.42) 20.5%, transparent 22.7%,
-      transparent 30.7%, rgba(242, 235, 218, 0.42) 32.8%, transparent 36.3%,
-      transparent 49.1%, rgba(242, 235, 218, 0.42) 52.5%, transparent 58.1%,
-      transparent 78.6%, rgba(242, 235, 218, 0.42) 84%, transparent 93%);
+      transparent 0% 4.4%, rgba(242, 235, 218, 0.25) 5%, transparent 5.8%,
+      transparent 7.4%, rgba(242, 235, 218, 0.25) 8%, transparent 8.9%,
+      transparent 12%, rgba(242, 235, 218, 0.25) 12.8%, transparent 14.2%,
+      transparent 19.2%, rgba(242, 235, 218, 0.25) 20.5%, transparent 22.7%,
+      transparent 30.7%, rgba(242, 235, 218, 0.25) 32.8%, transparent 36.3%,
+      transparent 49.1%, rgba(242, 235, 218, 0.25) 52.5%, transparent 58.1%,
+      transparent 78.6%, rgba(242, 235, 218, 0.25) 84%, transparent 93%);
   filter: blur(1px);
   opacity: 0.9;
   transform: scale(2.1, 1) rotate(0deg);
@@ -158,11 +156,13 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
    steps() snaps every few seconds — reality glitching around a stable label. */
 .btn-primary::after {
   content: ''; position: absolute; inset: -3px; z-index: -1;
+  /* The swirl below is the star — this layer only frames it: rim vignette,
+     a soft dark pool under the label so the text stays readable over the
+     strands, and a faint Doppler warmth on the approaching (left) side. */
   background:
-    radial-gradient(110% 145% at 50% 50%, transparent 48%, rgba(3, 3, 8, 0.28) 66%, rgba(3, 3, 8, 0.62) 80%, rgba(3, 3, 8, 0.92) 96%),
-    radial-gradient(40% 56% at 41% 50%, transparent 62%, rgba(255, 250, 240, 0.18) 73%, transparent 84%),
-    radial-gradient(42% 58% at 50% 50%, transparent 64%, rgba(242, 235, 218, 0.10) 76%, transparent 89%),
-    radial-gradient(38% 52% at 50% 50%, #000 0% 56%, rgba(0, 0, 0, 0.78) 71%, rgba(0, 0, 0, 0.35) 82%, transparent 92%);
+    radial-gradient(110% 145% at 50% 50%, transparent 55%, rgba(3, 3, 8, 0.55) 82%, rgb(3, 3, 8) 99%),
+    radial-gradient(44% 62% at 50% 50%, rgba(0, 0, 0, 0.92) 0% 38%, rgba(0, 0, 0, 0.55) 62%, transparent 84%),
+    radial-gradient(40% 30% at 28% 50%, rgba(255, 248, 236, 0.10), transparent 80%);
   animation: horizon-glitch 2.7s steps(1, end) infinite;
   pointer-events: none;
 }
@@ -213,9 +213,42 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   position: absolute; width: 1px; height: 1px; margin: -1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
+/* The swirl itself: SVG spiral strands (VortexLabel) stretched into the
+   button's ellipse. The group spins continuously while each strand's dashes
+   stream inward along the curve — two motions that together read as matter
+   spiralling down the drain. The strands vanish under the ::after shadow
+   near the core (they cross the horizon) and under the vignette at the rim. */
+.vx-swirl { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.vx-swirl svg { width: 100%; height: 100%; display: block; filter: blur(0.4px) drop-shadow(0 0 4px rgba(242, 235, 218, 0.30)); }
+.vx-spin {
+  transform-origin: 50px 50px;
+  animation: vx-rot 2.6s linear infinite;
+}
+.vx-strand {
+  stroke-dasharray: 16 10;
+  animation: vx-flow 0.8s linear infinite;
+}
+@keyframes vx-rot { to { transform: rotate(360deg); } }
+/* -26 = one full dash period (16+10), so the flow loops seamlessly. */
+@keyframes vx-flow { to { stroke-dashoffset: -26; } }
+
+/* Click and hold: dive into the rabbit hole. Spin and inward flow snap ~4x
+   faster, the deep rings rush (their loop is self-similar, so the phase
+   jump lands on a lookalike state), and the label is pulled toward the
+   horizon — its glitch animation is lifted so the transform applies. */
+.btn-primary:active::before { animation-duration: 0.3s; opacity: 1; }
+.btn-primary:active .vx-spin { animation-duration: 0.7s; }
+.btn-primary:active .vx-strand { animation-duration: 0.22s; }
+.btn-primary:active > .vx-label {
+  animation: none;
+  transform: scale(0.88);
+  filter: blur(0.4px);
+  transition: transform 500ms var(--ease-out), filter 500ms var(--ease-out);
+}
 @media (prefers-reduced-motion: reduce) {
   .btn-primary::before, .btn-primary::after,
-  .btn-primary > .vx-label, .vx-label .vx-l { animation: none !important; }
+  .btn-primary > .vx-label, .vx-label .vx-l,
+  .vx-spin, .vx-strand { animation: none !important; }
 }
 /* Secondary buttons are glass surfaces (class set in markup). */
 .btn-secondary { color: var(--fg-1); }
