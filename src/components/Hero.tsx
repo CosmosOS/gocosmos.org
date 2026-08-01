@@ -28,6 +28,24 @@ export function Hero() {
     let observer: IntersectionObserver | undefined;
     let cancelled = false;
     let timer = 0;
+    let started = false;
+    let inView = false;
+    let userPaused = false; // paused via the player's own keyboard bindings
+    let wantPlaying = false; // what this component last asked of the player
+
+    // play()/pause() reject forever once the cast fails to load — keep the
+    // control calls from spamming unhandled-rejection errors.
+    const quiet = (p?: Promise<unknown>) => { p?.catch(() => {}); };
+    const play = () => { wantPlaying = true; quiet(player?.play()); };
+    const pause = () => { wantPlaying = false; quiet(player?.pause()); };
+
+    // Also stop the loop while the tab is in the background.
+    const onVisibility = () => {
+      if (!started) return;
+      if (document.hidden) pause();
+      else if (inView && !userPaused) play();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     // The player sizes its type to fill the width by measuring glyphs at
     // creation time and never re-measures on font swap — so wait for the mono
@@ -52,19 +70,32 @@ export function Hero() {
         terminalLineHeight: 1.5,
         poster: 'npt:0.3',
       });
+      // A pause we didn't ask for is the user's (the player binds space/etc.
+      // even with controls:false) — never auto-resume over it.
+      player.addEventListener('pause', () => { if (wantPlaying) userPaused = true; });
+      player.addEventListener('play', () => { userPaused = false; });
       // Start once the terminal is fully on screen. Geometry comes from each
       // entry, so late player resizing can't skew the decision; if the terminal
       // is taller than the viewport, settle for the largest reachable share.
+      // After the first start the same observer pauses the loop whenever the
+      // terminal leaves the viewport — otherwise it animates its DOM forever
+      // while the visitor scrolls the rest of the page.
       observer = new IntersectionObserver(
         entries => {
           for (const entry of entries) {
-            const height = entry.boundingClientRect.height || 1;
-            const viewport = entry.rootBounds?.height ?? window.innerHeight;
-            const needed = Math.min(0.95, (viewport * 0.9) / height);
-            if (entry.intersectionRatio >= needed) {
-              player?.play();
-              observer?.disconnect();
-              break;
+            if (!started) {
+              const height = entry.boundingClientRect.height || 1;
+              const viewport = entry.rootBounds?.height ?? window.innerHeight;
+              const needed = Math.min(0.95, (viewport * 0.9) / height);
+              if (entry.intersectionRatio >= needed) {
+                started = true;
+                inView = true;
+                play();
+              }
+            } else {
+              inView = entry.intersectionRatio > 0;
+              if (!inView) pause();
+              else if (!document.hidden && !userPaused) play();
             }
           }
         },
@@ -75,6 +106,7 @@ export function Hero() {
 
     return () => {
       cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibility);
       window.clearTimeout(timer);
       observer?.disconnect();
       player?.dispose();

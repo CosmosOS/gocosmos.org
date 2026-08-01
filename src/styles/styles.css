@@ -81,7 +81,11 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   padding: 10px 16px; border-radius: 10px;
   font-family: var(--font-sans); font-size: 14px; font-weight: 500; line-height: 1;
   border: 1px solid transparent; cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-inout);
+  /* Explicit list — `all` would also transition `translate`, which the UFO
+     tractor beam drives per frame (a new transition every frame = jank). */
+  transition: background-color var(--dur-fast) var(--ease-inout), border-color var(--dur-fast) var(--ease-inout),
+    color var(--dur-fast) var(--ease-inout), transform var(--dur-fast) var(--ease-inout),
+    box-shadow var(--dur-fast) var(--ease-inout);
   text-decoration: none;
 }
 .btn svg { width: 16px; height: 16px; }
@@ -97,21 +101,30 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: var(--sheen, linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 38%, transparent 50%, rgba(255,255,255,0.03) 62%, transparent 100%)); pointer-events: none;
 }
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 [data-theme='light'] .btn-primary { background: var(--slate-0); color: var(--halo); border-color: rgba(255,255,255,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 20px rgba(0,0,0,0.22); }
-[data-theme='light'] .btn-primary:hover { background: #2A2A30; }
 /* Secondary buttons are glass surfaces (class set in markup). */
 .btn-secondary { color: var(--fg-1); }
-.btn-secondary.glass:hover { border-color: rgba(255, 255, 255, 0.24); transform: translateY(-1px); }
-[data-theme='light'] .btn-secondary.glass:hover { border-color: rgba(20, 20, 35, 0.22); }
+/* All :hover rules gated on `hover: hover` — touch devices don't clear the
+   hover state until another element is tapped, which left buttons stuck in
+   their hover style after every tap on mobile. */
+@media (hover: hover) {
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  [data-theme='light'] .btn-primary:hover { background: #2A2A30; }
+  .btn-secondary.glass:hover { border-color: rgba(255, 255, 255, 0.24); transform: translateY(-1px); }
+  [data-theme='light'] .btn-secondary.glass:hover { border-color: rgba(20, 20, 35, 0.22); }
+}
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; border-radius: 10px;
   background: transparent; color: var(--fg-2); border: 1px solid transparent;
-  cursor: pointer; transition: all var(--dur-fast) var(--ease-inout);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-inout), border-color var(--dur-fast) var(--ease-inout),
+    color var(--dur-fast) var(--ease-inout);
 }
 .icon-btn svg { width: 16px; height: 16px; }
-.icon-btn:hover { background: var(--bg-2); color: var(--fg-1); border-color: var(--border-1); }
+@media (hover: hover) {
+  .icon-btn:hover { background: var(--bg-2); color: var(--fg-1); border-color: var(--border-1); }
+}
 /* Theme toggle ships both icons; CSS shows the right one so the markup is
    identical for either theme (keeps prerendered HTML hydration-safe). */
 .theme-toggle .icon-sun, .theme-toggle .icon-moon { display: contents; }
@@ -125,7 +138,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   color: var(--halo, #F2EBDA);
   font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
 }
-[data-theme='light'] .gen-pill { color: #8A7635; }
+[data-theme='light'] .gen-pill { color: var(--fg-1); }
 
 /* Accent text — flat */
 .grad-text { color: var(--accent); }
@@ -147,11 +160,13 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .nav-brand img { height: 24px; width: auto; }
 .nav-links { display: flex; gap: 22px; margin-left: 16px; }
 .nav-links a { color: var(--fg-2); font-size: 14px; transition: color var(--dur-fast); }
-.nav-links a:hover { color: var(--fg-1); }
 .nav-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; height: 100%; }
 .nav-actions .btn { padding: 0 16px; height: 100%; font-size: 13px; border-radius: 999px; line-height: 1; }
 .nav-actions .icon-btn { height: 36px; width: 36px; border-radius: 999px; }
-.nav-actions .btn-primary:hover { transform: none; }
+@media (hover: hover) {
+  .nav-links a:hover { color: var(--fg-1); }
+  .nav-actions .btn-primary:hover { transform: none; }
+}
 
 @media (max-width: 880px) {
   .nav { padding: 0 16px; }
@@ -266,6 +281,21 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
    Sections
    ============================================================ */
 .section { padding: 96px 0; }
+/* Offscreen sections skip layout, paint and their glass backdrop blurs
+   entirely — the single biggest scroll win. `auto` keeps anchor links,
+   find-in-page and the IntersectionObserver reveals working. The intrinsic
+   sizes are per-breakpoint estimates of real section heights so the first
+   pass doesn't shift scroll position on browsers without scroll anchoring
+   (Safari); after first render the browser remembers exact sizes. */
+.section { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+@media (max-width: 1024px) {
+  #features { contain-intrinsic-size: auto 1250px; }
+}
+@media (max-width: 560px) {
+  #features { contain-intrinsic-size: auto 2100px; }
+  #timeline { contain-intrinsic-size: auto 1000px; }
+  #community { contain-intrinsic-size: auto 1100px; }
+}
 .section-tinted { background: linear-gradient(180deg, transparent 0%, rgba(15, 15, 21, 0.5) 50%, transparent 100%); }
 [data-theme='light'] .section-tinted { background: none; }
 .section-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
@@ -286,10 +316,12 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   border-radius: 18px;
   position: relative;
 }
-[data-theme='light'] .hero-accent { color: #8A7635; }
+/* Cream reads as near-invisible on white — mirror the dark-mode pairing
+   (cream on off-white text) with slate on near-black text so light mode
+   stays strictly monochrome. */
+[data-theme='light'] .hero-accent { color: var(--fg-1); }
 .era-title.hero-accent { color: var(--halo, #F2EBDA); padding: 0; }
-/* Cream reads as near-invisible on white — darken the gold in light mode. */
-[data-theme='light'] .era-title.hero-accent { color: #8A7635; }
+[data-theme='light'] .era-title.hero-accent { color: var(--fg-1); }
 
 /* ============================================================
    Features
@@ -307,18 +339,20 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   transition: border-color var(--dur-fast) var(--ease-inout), box-shadow var(--dur-fast), transform var(--dur-fast);
   overflow: hidden;
 }
-.feature-card.glass:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .feature-card.glass:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
+  }
+  [data-theme='light'] .feature-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
 }
-[data-theme='light'] .feature-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
 .feature-icon {
   width: 36px; height: 36px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   color: var(--halo, #F2EBDA); margin-bottom: 18px;
   position: relative; z-index: 1;
 }
-[data-theme='light'] .feature-icon { color: #8A7635; }
+[data-theme='light'] .feature-icon { color: var(--fg-1); }
 .feature-icon svg { width: 16px; height: 16px; }
 .feature-title { font-size: 15px; font-weight: 600; color: var(--fg-1); margin: 0 0 6px; letter-spacing: -0.01em; }
 .feature-desc { font-size: 13.5px; line-height: 1.55; color: var(--fg-2); margin: 0; }
@@ -352,7 +386,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   letter-spacing: 0.04em;
 }
 .era-tag-current { color: var(--halo, #F2EBDA); border-radius: 999px; }
-[data-theme='light'] .era-tag-current { color: #8A7635; }
+[data-theme='light'] .era-tag-current { color: var(--fg-1); }
 .era-year { font-family: var(--font-mono); font-size: 12px; color: var(--fg-3); }
 .era-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 10px; color: var(--fg-1); }
 .era-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); margin: 0; max-width: 580px; }
@@ -371,7 +405,9 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   background: var(--bg-3); border: 1px solid var(--border-1);
   transition: transform var(--dur-fast), border-color var(--dur-fast);
 }
-.avatar:hover { transform: scale(1.06); border-color: var(--accent); }
+@media (hover: hover) {
+  .avatar:hover { transform: scale(1.06); border-color: var(--accent); }
+}
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
 .avatar-fallback {
   display: flex; align-items: center; justify-content: center;
@@ -405,8 +441,10 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   text-decoration: none; color: inherit;
   transition: border-color var(--dur-fast), transform var(--dur-fast);
 }
-.link-card.glass:hover { border-color: rgba(255, 255, 255, 0.22); }
-[data-theme='light'] .link-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
+@media (hover: hover) {
+  .link-card.glass:hover { border-color: rgba(255, 255, 255, 0.22); }
+  [data-theme='light'] .link-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
+}
 .link-icon {
   width: 36px; height: 36px; border-radius: 10px;
   background: transparent; border: 1px solid var(--border-1);
@@ -419,7 +457,9 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .link-text p { margin: 0; font-size: 12.5px; color: var(--fg-2); line-height: 1.45; }
 .link-arrow { color: var(--fg-3); display: flex; }
 .link-arrow svg { width: 14px; height: 14px; }
-.link-card:hover .link-arrow { color: var(--fg-1); transform: translateX(2px); }
+@media (hover: hover) {
+  .link-card:hover .link-arrow { color: var(--fg-1); transform: translateX(2px); }
+}
 
 /* ============================================================
    Footer
@@ -441,10 +481,29 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   display: block; padding: 5px 0; font-size: 14px; color: var(--fg-2);
   transition: color var(--dur-fast);
 }
-.footer-cols a:hover { color: var(--fg-1); }
+@media (hover: hover) {
+  .footer-cols a:hover { color: var(--fg-1); }
+}
 .footer-fine {
   display: flex; justify-content: space-between; padding-top: 24px;
   border-top: 1px solid var(--border-1);
   font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-3);
 }
 @media (max-width: 600px) { .footer-fine { flex-direction: column; gap: 8px; } }
+
+/* ============================================================
+   Tap feedback — :active clears the moment the finger lifts, so it's the
+   right primitive for touch (unlike :hover, which sticks). brightness()
+   avoids the transparency artifact `opacity` would cause on glass surfaces
+   and doesn't collide with the UFO's per-frame transforms on buttons.
+   ============================================================ */
+.btn:active,
+.icon-btn:active,
+.feature-card.glass:active,
+.link-card.glass:active,
+.avatar:active {
+  filter: brightness(0.92);
+  transition: filter 80ms var(--ease-out);
+}
+.nav-links a:active,
+.footer-cols a:active { opacity: 0.6; }

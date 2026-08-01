@@ -58,34 +58,78 @@ export function Ufo() {
     // Tractor-beam interaction: glass surfaces near the saucer get tugged
     // toward it and lit by a purple underglow. Displacement goes through the
     // CSS `translate` property so it composes with (never overrides) the
-    // reveal/hover transforms. Smoothed per frame; radius in px.
+    // reveal/hover transforms.
+    //
+    // Geometry is cached (refreshed on scroll/resize, throttled to 10Hz, and
+    // at least every 250ms) and elements far from the saucer with settled
+    // effects are skipped without touching style at all — so the steady-state
+    // cost per frame is a few distance checks, not 25 rect reads + writes.
     const REACH = 240;
     const MAX_PULL = 9;
-    const tugs = new WeakMap<HTMLElement, { x: number; y: number }>();
-    const interact = (dt: number, active: boolean) => {
-      const cx = x + CELL_W / 2;
-      const cy = y + CELL_H / 2;
-      const blend = Math.min(dt * 6, 1);
-      document.querySelectorAll<HTMLElement>('.glass').forEach(g => {
+    // Text sitting straight on the starfield — with no glass to blur the
+    // saucer, its silhouette bleeds into the letters. Cache those rects and
+    // shrink the UFO ("flies away") when it drifts behind one.
+    const SHY_SELECTOR = '.hero-title, .hero-sub, .section-head, .section-sub, .era-title, .era-desc, .era-meta, .footer-tagline, .footer-cols, .footer-fine, .footer-brand';
+    const SHY_PAD = 24;
+    const MIN_SCALE = 0.4;
+    const tugs = new WeakMap<HTMLElement, { x: number; y: number; o: number }>();
+    let els: HTMLElement[] = [];
+    let base: { cx: number; cy: number; left: number; top: number; w: number; h: number }[] = [];
+    let shyRects: { left: number; top: number; right: number; bottom: number }[] = [];
+    let cacheAt = -1e9;
+    let cacheStale = true;
+    let scale = 1;
+    const invalidate = () => { cacheStale = true; };
+
+    const refreshCache = (t: number) => {
+      els = Array.from(document.querySelectorAll<HTMLElement>('.glass'));
+      base = els.map(g => {
         const r = g.getBoundingClientRect();
-        const ex = r.left + r.width / 2;
-        const ey = r.top + r.height / 2;
-        const dist = Math.hypot(cx - ex, cy - ey);
-        const strength = active && r.width > 0 ? Math.max(0, 1 - dist / REACH) : 0;
+        // Subtract the element's own tug so cached centers are its rest position.
+        const f = tugs.get(g);
+        const ox = f?.x ?? 0;
+        const oy = f?.y ?? 0;
+        return {
+          left: r.left - ox, top: r.top - oy, w: r.width, h: r.height,
+          cx: r.left + r.width / 2 - ox, cy: r.top + r.height / 2 - oy,
+        };
+      });
+      shyRects = Array.from(document.querySelectorAll<HTMLElement>(SHY_SELECTOR)).map(e => {
+        const r = e.getBoundingClientRect();
+        return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      });
+      cacheAt = t;
+      cacheStale = false;
+    };
+
+    const interact = (t: number, dt: number, active: boolean) => {
+      if ((cacheStale && t - cacheAt > 100) || t - cacheAt > 250) refreshCache(t);
+      const scx = x + CELL_W / 2;
+      const scy = y + CELL_H / 2;
+      const blend = Math.min(dt * 6, 1);
+      for (let i = 0; i < els.length; i++) {
+        const g = els[i];
+        const b = base[i];
+        if (b.w === 0) continue;
+        const dist = Math.hypot(scx - b.cx, scy - b.cy);
+        const strength = active ? Math.max(0, 1 - dist / REACH) : 0;
+        const tug = tugs.get(g) ?? { x: 0, y: 0, o: 0 };
+        // Out of reach and fully settled — skip all style work.
+        if (strength < 0.005 && tug.o < 0.005 && Math.abs(tug.x) < 0.05 && Math.abs(tug.y) < 0.05) continue;
         const pull = strength * strength * MAX_PULL;
-        const tug = tugs.get(g) ?? { x: 0, y: 0 };
-        tug.x += ((dist > 1 ? ((cx - ex) / dist) * pull : 0) - tug.x) * blend;
-        tug.y += ((dist > 1 ? ((cy - ey) / dist) * pull : 0) - tug.y) * blend;
+        tug.x += ((dist > 1 ? ((scx - b.cx) / dist) * pull : 0) - tug.x) * blend;
+        tug.y += ((dist > 1 ? ((scy - b.cy) / dist) * pull : 0) - tug.y) * blend;
+        tug.o = strength;
         tugs.set(g, tug);
         if (Math.abs(tug.x) > 0.05 || Math.abs(tug.y) > 0.05) {
           g.style.translate = `${tug.x.toFixed(2)}px ${tug.y.toFixed(2)}px`;
         } else if (g.style.translate) {
           g.style.translate = '';
         }
-        g.style.setProperty('--ufo-x', `${(((cx - r.left) / r.width) * 100).toFixed(1)}%`);
-        g.style.setProperty('--ufo-y', `${(((cy - r.top) / r.height) * 100).toFixed(1)}%`);
+        g.style.setProperty('--ufo-x', `${(((scx - b.left) / b.w) * 100).toFixed(1)}%`);
+        g.style.setProperty('--ufo-y', `${(((scy - b.top) / b.h) * 100).toFixed(1)}%`);
         g.style.setProperty('--ufo-o', strength.toFixed(3));
-      });
+      }
     };
 
     const tick = (t: number) => {
@@ -136,22 +180,53 @@ export function Ufo() {
       // Reached the waypoint early — drift on to the next one.
       if (!chasing && Math.hypot(tx - x, ty - y) < 24) pickWaypoint();
 
+      // "Fly away" when drifting behind bare text — but only if no glass
+      // surface sits in front (glass already softens the silhouette enough
+      // that the text stays readable).
+      const scx = x + CELL_W / 2;
+      const scy = y + CELL_H / 2;
+      let overText = 0;
+      for (let i = 0; i < shyRects.length; i++) {
+        const r = shyRects[i];
+        if (scx < r.left - SHY_PAD || scx > r.right + SHY_PAD ||
+            scy < r.top - SHY_PAD || scy > r.bottom + SHY_PAD) continue;
+        const dx = Math.min(scx - (r.left - SHY_PAD), (r.right + SHY_PAD) - scx);
+        const dy = Math.min(scy - (r.top - SHY_PAD), (r.bottom + SHY_PAD) - scy);
+        const depth = Math.min(1, Math.min(dx, dy) / SHY_PAD);
+        if (depth > overText) overText = depth;
+      }
+      let overGlass = 0;
+      for (let i = 0; i < base.length; i++) {
+        const b = base[i];
+        if (b.w === 0) continue;
+        if (scx >= b.left && scx <= b.left + b.w && scy >= b.top && scy <= b.top + b.h) {
+          overGlass = 1;
+          break;
+        }
+      }
+      const targetScale = 1 - overText * (1 - overGlass) * (1 - MIN_SCALE);
+      scale += (targetScale - scale) * Math.min(dt * 5, 1);
+
       const bank = Math.max(-12, Math.min(12, vx * 0.025));
       const bob = Math.sin(t / 650) * 3;
-      el.style.transform = `translate3d(${x.toFixed(1)}px, ${(y + bob).toFixed(1)}px, 0) rotate(${bank.toFixed(1)}deg)`;
+      el.style.transform = `translate3d(${x.toFixed(1)}px, ${(y + bob).toFixed(1)}px, 0) rotate(${bank.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
       el.style.backgroundPosition = `${-frame * CELL_W}px 0`;
 
       // The saucer is display:none in light mode — an invisible UFO must not
       // keep tugging elements, so effects decay to zero there.
-      interact(dt, document.documentElement.dataset.theme !== 'light');
+      interact(t, dt, document.documentElement.dataset.theme !== 'light');
 
       raf = requestAnimationFrame(tick);
     };
 
     window.addEventListener('pointermove', onPointer, { passive: true });
+    window.addEventListener('scroll', invalidate, { passive: true });
+    window.addEventListener('resize', invalidate);
     raf = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener('pointermove', onPointer);
+      window.removeEventListener('scroll', invalidate);
+      window.removeEventListener('resize', invalidate);
       cancelAnimationFrame(raf);
       document.querySelectorAll<HTMLElement>('.glass').forEach(g => {
         g.style.translate = '';
