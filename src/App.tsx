@@ -4,6 +4,7 @@ import './styles/styles.css';
 import { useReveal } from './hooks/useReveal';
 import { useGlassGlare } from './hooks/useGlassGlare';
 import { Starfield } from './components/Starfield';
+import { Ufo } from './components/Ufo';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
@@ -18,6 +19,7 @@ export function App() {
   return (
     <>
       <Starfield />
+      <Ufo />
       <Nav />
       <main>
         <Hero />

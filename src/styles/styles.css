@@ -46,6 +46,17 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
     inset 0 1px 0 rgba(255, 255, 255, 0.90),
     0 8px 24px rgba(25, 25, 50, 0.08);
 }
+/* UFO underglow — a purple sheen that sweeps across glass surfaces as the
+   saucer passes behind them (Ufo.tsx sets the vars). Dark mode only. */
+.glass.glass::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(170px circle at var(--ufo-x, 50%) var(--ufo-y, 220%),
+    rgba(190, 170, 230, 0.20), rgba(190, 170, 230, 0.06) 45%, transparent 70%);
+  opacity: var(--ufo-o, 0);
+  pointer-events: none;
+}
+[data-theme='light'] .glass.glass::before { display: none; }
+
 /* Specular glare that follows the cursor (useGlassGlare sets the vars). */
 .glass.glass::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
@@ -169,6 +180,18 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   width: 100vw; height: 100vh;
   z-index: -2; opacity: 1; pointer-events: none;
 }
+/* Background saucer — above the starfield, behind the page (so it drifts
+   blurred beneath glass surfaces). Position is driven by Ufo.tsx. */
+.ufo {
+  position: fixed; top: 0; left: 0;
+  width: 104px; height: 40px;
+  /* 29-frame strip is 3770x50 natively; shown at 80% (cells 104x40) */
+  background: url('/assets/ufo-sprite.webp') 0 0 / 3016px 40px no-repeat;
+  z-index: -1; pointer-events: none;
+  will-change: transform;
+  opacity: 0.85;
+}
+[data-theme='light'] .ufo { display: none; }
 .hero-inner {
   max-width: 980px; margin: 0 auto; padding: 0 32px;
   text-align: center;
