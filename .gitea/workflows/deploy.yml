@@ -1,0 +1,25 @@
+name: Deploy
+on:
+  push:
+    branches: [master]
+    # CI-only commits don't redeploy the site
+    paths-ignore:
+      - ".gitea/**"
+
+jobs:
+  deploy:
+    runs-on: deploy
+    steps:
+      - name: Sync deploy clone and redeploy
+        run: |
+          set -e
+          DEPLOY_DIR=/mnt/sda1/Users/amnesia/Docker/Websites/DevValentinBzh-deploy
+          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@git.amnesia.cloud/${{ github.repository }}.git"
+          if [ ! -d "$DEPLOY_DIR/.git" ]; then
+            git clone --branch master "$REPO_URL" "$DEPLOY_DIR"
+          fi
+          cd "$DEPLOY_DIR"
+          git remote set-url origin "$REPO_URL"
+          git fetch origin master
+          git reset --hard origin/master
+          docker compose -p devvalentinbzh up -d --build

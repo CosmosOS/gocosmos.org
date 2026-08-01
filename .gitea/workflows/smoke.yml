@@ -1,0 +1,15 @@
+name: CI smoke test
+on: push
+
+jobs:
+  smoke:
+    runs-on: deploy
+    steps:
+      - name: Verify runner plumbing
+        run: |
+          set -e
+          docker version --format 'docker {{.Server.Version}}'
+          docker compose version
+          git --version
+          ls /mnt/sda1/Users/amnesia/Docker/Websites/DevValentinBzh/docker-compose.yml
+          echo "runner plumbing OK"
