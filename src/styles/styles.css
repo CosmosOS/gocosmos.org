@@ -20,12 +20,20 @@ img { display: block; max-width: 100%; }
 html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px); }
 
 /* ============================================================
-   Glass system — frosted surfaces + cursor-tracking glare
+   Glass system — frosted surfaces, cursor-lit on hover
    ============================================================ */
 /* Doubled class so component rules written later (single class) can't
-   accidentally override the surface. Radius comes from each component. */
+   accidentally override the surface. Radius comes from each component.
+   The --glare-* / --sh-* vars are driven by useGlassLight on the hovered
+   pane only: its border ring glints under the cursor and the drop shadow
+   slides away. The surface itself stays static — no whole-pane response. */
 .glass.glass {
   position: relative;
+  /* A glass pane must never clip: the ::after edge glint sits ON the border
+     ring (inset -1px) and dies under any overflow:hidden — that bug hit the
+     terminal and the feature cards once each. Components that need to clip
+     their content must do it on an inner wrapper (see .term-player). */
+  overflow: visible;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06) 100%),
@@ -35,7 +43,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18),
-    0 8px 24px rgba(0, 0, 0, 0.30);
+    var(--sh-x, 0px) var(--sh-y, 8px) 24px rgba(0, 0, 0, 0.30);
 }
 [data-theme='light'] .glass.glass {
   border-color: rgba(20, 20, 35, 0.10);
@@ -44,7 +52,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
     rgba(255, 255, 255, 0.30);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.90),
-    0 8px 24px rgba(25, 25, 50, 0.08);
+    var(--sh-x, 0px) var(--sh-y, 8px) 24px rgba(25, 25, 50, 0.08);
 }
 /* UFO underglow — a purple sheen that sweeps across glass surfaces as the
    saucer passes behind them (Ufo.tsx sets the vars). Dark mode only. */
@@ -57,18 +65,25 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 }
 [data-theme='light'] .glass.glass::before { display: none; }
 
-/* Specular glare that follows the cursor (useGlassGlare sets the vars). */
+/* Edge glint on the hovered pane only: the cursor's light caught by the 1px
+   border ring. The two mask layers (content-box vs full box) composited with
+   `exclude` keep only the ring, so the surface itself gets no halo wash. */
 .glass.glass::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit;
-  background: radial-gradient(240px circle at var(--glare-x, 50%) var(--glare-y, -30%),
-    rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05) 40%, transparent 65%);
+  content: ''; position: absolute; inset: -1px; border-radius: inherit;
+  padding: 1px;
+  /* Kept deliberately quiet in dark mode — at full hover intensity this only
+     lifts the 0.12 hairline to ~0.4 near the cursor. */
+  background: radial-gradient(var(--glare-r, 160px) circle at var(--glare-x, 50%) var(--glare-y, -30%),
+    rgba(255, 255, 255, 0.40), rgba(255, 255, 255, 0.12) 42%, transparent 72%);
   opacity: var(--glare-o, 0);
-  transition: opacity 200ms var(--ease-out);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   pointer-events: none;
 }
 [data-theme='light'] .glass.glass::after {
-  background: radial-gradient(240px circle at var(--glare-x, 50%) var(--glare-y, -30%),
-    rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.40) 40%, transparent 65%);
+  background: radial-gradient(var(--glare-r, 160px) circle at var(--glare-x, 50%) var(--glare-y, -30%),
+    rgba(20, 20, 35, 0.45), rgba(20, 20, 35, 0.14) 45%, transparent 75%);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass.glass { background: rgba(22, 22, 30, 0.92); }
@@ -236,10 +251,13 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 /* Hero terminal — full container width, same as the section grids. The
    surface itself (background, border, shadow) comes from .glass so it
    matches the rest of the design in both themes. */
+/* No overflow:hidden here — it would clip the .glass::after edge glint,
+   which sits on the border ring. The children round their own corners
+   (outer 14px minus the 1px glass border). */
 .terminal {
   margin: 0 auto;
   border-radius: 14px;
-  overflow: hidden; text-align: left;
+  text-align: left;
 }
 /* Divider tracks the glass surface, not var(--border-1) — the token flips
    to near-white in light mode, which read as a white line in the window. */
@@ -247,6 +265,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   display: flex; align-items: center; gap: 7px;
   padding: 11px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
+  border-radius: 13px 13px 0 0;
 }
 [data-theme='light'] .term-bar {
   border-bottom-color: rgba(20, 20, 35, 0.10);
@@ -254,7 +273,9 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 }
 .term-dot { width: 11px; height: 11px; border-radius: 50%; }
 .term-title { margin-left: 12px; font-family: var(--font-mono); font-size: 11px; color: #6E6E85; }
-.term-player { padding: 0; }
+/* The screen is opaque near-black in both themes, like a real terminal —
+   only the window frame (bar, border, shadow) is glass. */
+.term-player { padding: 0; border-radius: 0 0 13px 13px; overflow: hidden; background: #0B0B11; }
 /* Asciinema player, restyled to sit inside the hero terminal frame. */
 .term-player .ap-wrapper { background: transparent; }
 .term-player .ap-player { border-radius: 0; }
@@ -289,9 +310,8 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
    snapshots it into JS at creation and paints colored spans with inline
    `style.color` — only default-colored text follows the live CSS var, so
    a light-mode palette desyncs (dark plain text, snapshot-bright colored
-   text). The screen keeps the classic dark look in both themes instead;
-   glass is the window, not the screen. */
-[data-theme='light'] .term-player { background: rgba(11, 11, 17, 0.9); }
+   text). The screen keeps the classic dark look in both themes instead
+   (opaque background on .term-player); glass is the window, not the screen. */
 
 /* ============================================================
    Sections
@@ -353,7 +373,6 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   border-radius: 18px;
   padding: 26px 24px 24px;
   transition: border-color var(--dur-fast) var(--ease-inout), box-shadow var(--dur-fast), transform var(--dur-fast);
-  overflow: hidden;
 }
 @media (hover: hover) {
   .feature-card.glass:hover {
