@@ -143,7 +143,7 @@ export function Hero() {
       </div>
 
       <div className="container">
-        <div className="terminal">
+        <div className="terminal glass">
           <div className="term-bar">
             <span className="term-dot" style={{ background: '#FF6B6B' }} />
             <span className="term-dot" style={{ background: '#FFB454' }} />
