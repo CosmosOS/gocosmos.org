@@ -59,7 +59,7 @@ export function Hero() {
 
     Promise.all([import('asciinema-player'), Promise.race([fontsReady, fallback])]).then(([{ create }]) => {
       if (cancelled) return;
-      player = create('/assets/helloworld.cast', node, {
+      player = create('/assets/cosmos-build-run.cast', node, {
         cols: 100,
         rows: 20,
         preload: true,
@@ -145,12 +145,12 @@ export function Hero() {
             <span className="term-dot" style={{ background: '#FF6B6B' }} />
             <span className="term-dot" style={{ background: '#FFB454' }} />
             <span className="term-dot" style={{ background: '#3DDC84' }} />
-            <span className="term-title">cosmos@gen3 — make run KERNEL=HelloWorld</span>
+            <span className="term-title">cosmos@gen3 — cosmos build && cosmos run</span>
           </div>
           <div
             className="term-player"
             ref={playerRef}
-            aria-label="Recording of make run KERNEL=HelloWorld building the kernel and booting it in QEMU"
+            aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
           />
         </div>
       </div>
