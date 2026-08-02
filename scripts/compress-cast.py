@@ -87,10 +87,19 @@ for gap, e in zip(new_gaps, events):
     t += gap
     out.append([round(t, 6), e[1], e[2]])
 
+# Chapter markers (asciicast v2 "m" events): shown as dots on the player's
+# timeline, and [ / ] jump between them.
+labels = {prompts[0]: "cosmos build", p2: "cosmos run"}
+banner = next((i for i, e in enumerate(events) if "CosmosOS" in e[2]), None)
+if banner is not None:
+    labels[banner] = "kernel boot (UART)"
+
 header["idle_time_limit"] = 2.0
 with open(dst, "w") as f:
     f.write(json.dumps(header) + "\n")
-    for e in out:
+    for i, e in enumerate(out):
+        if i in labels:
+            f.write(json.dumps([e[0], "m", labels[i]]) + "\n")
         f.write(json.dumps(e) + "\n")
 
 print(f"events={len(out)} duration={out[-1][0]:.1f}s "

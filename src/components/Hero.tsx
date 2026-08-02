@@ -32,6 +32,8 @@ export function Hero() {
     let inView = false;
     let userPaused = false; // paused via the player's own keyboard bindings
     let wantPlaying = false; // what this component last asked of the player
+    let isPlaying = false;
+    let onTermClick: ((e: MouseEvent) => void) | undefined;
 
     // play()/pause() reject forever once the cast fails to load — keep the
     // control calls from spamming unhandled-rejection errors.
@@ -64,16 +66,31 @@ export function Hero() {
         rows: 20,
         preload: true,
         loop: true,
-        controls: false,
+        controls: 'auto',
         theme: 'cosmos',
         terminalFontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
         terminalLineHeight: 1.5,
         poster: 'npt:0.3',
       });
-      // A pause we didn't ask for is the user's (the player binds space/etc.
-      // even with controls:false) — never auto-resume over it.
-      player.addEventListener('pause', () => { if (wantPlaying) userPaused = true; });
-      player.addEventListener('play', () => { userPaused = false; });
+      // A pause we didn't ask for is the user's (space, the control bar, or a
+      // click on the terminal) — never auto-resume over it.
+      player.addEventListener('pause', () => { isPlaying = false; if (wantPlaying) userPaused = true; });
+      player.addEventListener('play', () => { isPlaying = true; userPaused = false; });
+      // Click on the terminal toggles playback, so a visitor can freeze the
+      // boot log and seek around with the control bar. Pausing goes through
+      // the player directly (not pause()) so wantPlaying stays true and the
+      // pause listener above attributes it to the user. Control-bar clicks
+      // keep their own meaning.
+      onTermClick = e => {
+        if (!player || (e.target as HTMLElement).closest('.ap-control-bar')) return;
+        if (isPlaying) {
+          quiet(player.pause());
+        } else {
+          started = true;
+          play();
+        }
+      };
+      node.addEventListener('click', onTermClick);
       // Start once the terminal is fully on screen. Geometry comes from each
       // entry, so late player resizing can't skew the decision; if the terminal
       // is taller than the viewport, settle for the largest reachable share.
@@ -107,6 +124,7 @@ export function Hero() {
     return () => {
       cancelled = true;
       document.removeEventListener('visibilitychange', onVisibility);
+      if (onTermClick) node.removeEventListener('click', onTermClick);
       window.clearTimeout(timer);
       observer?.disconnect();
       player?.dispose();

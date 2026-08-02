@@ -475,6 +475,8 @@ html.js .nav-cta:not(.is-visible) {
    Doubled class beats the player's own `.ap-player .ap-overlay { display: flex }`,
    which has equal specificity and loads after this file in the bundle. */
 .term-player .ap-overlay.ap-overlay-start { display: none; }
+/* The screen itself toggles playback on click (see Hero.tsx). */
+.term-player .ap-terminal { cursor: pointer; }
 /* Doubled class: the player's own CSS lands later in the bundle and resets
    every slot to white via `.ap-player { --term-color-N: ... }` at the same
    specificity — without the bump this whole palette silently never applies. */
