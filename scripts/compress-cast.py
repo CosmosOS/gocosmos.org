@@ -9,6 +9,7 @@ Segments (found by markers, not fixed indices):
 Tail: everything from the QEMU "terminating on signal" line on is dropped.
 """
 import json
+import os
 import sys
 
 BUILD_TARGET = 6.0
@@ -22,6 +23,12 @@ with open(src) as f:
 
 header = json.loads(lines[0])
 raw = [json.loads(l) for l in lines[1:] if l.strip()]
+
+# The build output and QEMU echo leak the recording user's real $HOME; show
+# the generic identity of the cosmos@gen3 prompt instead.
+home = os.path.expanduser("~")
+raw = [[t, k, d.replace(home, "/home/cosmos") if k == "o" else d]
+       for t, k, d in raw]
 
 # QEMU on the pty writes byte-at-a-time (~30k events). Merge bursts, but flush
 # at every newline so one event = one line: the site binds the arrow keys to
