@@ -506,6 +506,22 @@ html.js .nav-cta:not(.is-visible) {
    a light-mode palette desyncs (dark plain text, snapshot-bright colored
    text). The screen keeps the classic dark look in both themes instead
    (opaque background on .term-player); glass is the window, not the screen. */
+/* The transparent --term-color-background above also feeds the player's
+   overlays: tooltips, the PAUSED flash, and the kbd keycaps (help panel and
+   keystroke overlay) all paint their TEXT in background-color on a
+   near-white pill — transparent ink, unreadable — and the help panel loses
+   its backdrop. Re-pin solid inks from the screen palette. Doubled class:
+   the player's CSS loads later at equal specificity (see above). */
+.term-player.term-player .ap-tooltip-container span.ap-tooltip,
+.term-player.term-player .ap-overlay-info span,
+.term-player.term-player .ap-overlay-keystrokes .ap-keystroke-pill kbd,
+.term-player.term-player .ap-overlay-help > div div kbd {
+  color: #0B0B11;
+}
+.term-player.term-player .ap-overlay-help > div div {
+  background-color: #14141C;
+  border-color: #2A2A38;
+}
 
 /* ============================================================
    Sections
