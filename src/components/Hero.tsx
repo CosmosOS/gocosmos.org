@@ -34,6 +34,7 @@ export function Hero() {
     let wantPlaying = false; // what this component last asked of the player
     let isPlaying = false;
     let onTermClick: ((e: MouseEvent) => void) | undefined;
+    let onTermKeyDown: ((e: KeyboardEvent) => void) | undefined;
 
     // play()/pause() reject forever once the cast fails to load — keep the
     // control calls from spamming unhandled-rejection errors.
@@ -91,6 +92,25 @@ export function Hero() {
         }
       };
       node.addEventListener('click', onTermClick);
+      // ←/→ step one line instead of the player's hardwired 5s jump. step()
+      // isn't on the public API, so forward the arrows to the player's own
+      // ,/. frame-step bindings (the cast is generated one-line-per-event by
+      // compress-cast.py, so one step = one line). Stepping is a no-op while
+      // playing, so a first press during playback pauses instead. Shift+←/→
+      // keep the native coarse jump.
+      onTermKeyDown = e => {
+        if (e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        e.stopPropagation();
+        const target = e.target as HTMLElement;
+        const step = () => target.dispatchEvent(
+          new KeyboardEvent('keydown', { key: e.key === 'ArrowLeft' ? ',' : '.', bubbles: true }),
+        );
+        if (isPlaying) quiet(player?.pause().then(step));
+        else step();
+      };
+      node.addEventListener('keydown', onTermKeyDown, true);
       // Start once the terminal is fully on screen. Geometry comes from each
       // entry, so late player resizing can't skew the decision; if the terminal
       // is taller than the viewport, settle for the largest reachable share.
@@ -125,6 +145,7 @@ export function Hero() {
       cancelled = true;
       document.removeEventListener('visibilitychange', onVisibility);
       if (onTermClick) node.removeEventListener('click', onTermClick);
+      if (onTermKeyDown) node.removeEventListener('keydown', onTermKeyDown, true);
       window.clearTimeout(timer);
       observer?.disconnect();
       player?.dispose();

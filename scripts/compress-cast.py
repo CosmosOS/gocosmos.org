@@ -13,7 +13,7 @@ import sys
 
 BUILD_TARGET = 6.0
 GAP_CAP = 1.0  # max silence between events after scaling
-COALESCE = 0.016  # merge output events closer than one 60fps frame
+COALESCE = 0.03  # merge output bursts; typed chars (55ms apart) stay separate
 
 src, dst = sys.argv[1], sys.argv[2]
 
@@ -23,14 +23,38 @@ with open(src) as f:
 header = json.loads(lines[0])
 raw = [json.loads(l) for l in lines[1:] if l.strip()]
 
-# QEMU on the pty writes byte-at-a-time (~30k events); merge bursts.
+# QEMU on the pty writes byte-at-a-time (~30k events). Merge bursts, but flush
+# at every newline so one event = one line: the site binds the arrow keys to
+# the player's step(), which advances exactly one event.
 events = []
-for e in raw:
-    if events and e[1] == "o" and events[-1][1] == "o" \
-            and e[0] - events[-1][0] < COALESCE:
-        events[-1][2] += e[2]
-    else:
-        events.append([e[0], e[1], e[2]])
+buf = ""
+buf_t = last_t = 0.0
+
+
+def flush():
+    global buf
+    if buf:
+        events.append([buf_t, "o", buf])
+        buf = ""
+
+
+for t, kind, data in raw:
+    if kind != "o":
+        flush()
+        events.append([t, kind, data])
+        continue
+    if buf and t - last_t > COALESCE:
+        flush()
+    if not buf:
+        buf_t = t
+    buf += data
+    last_t = t
+    while "\n" in buf:
+        cut = buf.index("\n") + 1
+        events.append([buf_t, "o", buf[:cut]])
+        buf = buf[cut:]
+        buf_t = t
+flush()
 
 # Drop the kill-message tail.
 cut = next((i for i, e in enumerate(events)
