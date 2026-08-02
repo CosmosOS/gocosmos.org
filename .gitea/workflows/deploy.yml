@@ -29,17 +29,15 @@ jobs:
           FTP_DOCROOT: public_html
         run: |
           set -e
-          apt-get update -qq && apt-get install -y -qq lftp
-          # --delete prunes stale hashed assets so the 256 MB quota never fills;
-          # it also removes anything else in the docroot not present in html/.
-          # verify-certificate off: the server's Let's Encrypt cert is expired.
-          # TLS 1.2 forced: lftp/gnutls fails TLS 1.3 session reuse on the data
-          # channel with this server (gnutls_record_recv: unexpected TLS packet).
-          # -d: full FTP/TLS dialogue in the log (lftp masks the password)
-          lftp -d -u "$FTP_USER,$FTP_PASSWORD" "$FTP_HOST" -e "
-            set ftp:ssl-force true;
-            set ftp:ssl-protect-data true;
-            set ssl:priority NORMAL:-VERS-TLS1.3;
-            set ssl:verify-certificate no;
-            mirror -R --delete site/html/ $FTP_DOCROOT/;
-            quit"
+          apt-get update -qq && apt-get install -y -qq rclone
+          # rclone (Go TLS) instead of lftp: this server breaks the gnutls
+          # session right after PASS. sync mirrors html/ and prunes stale
+          # hashed assets so the 256 MB quota never fills.
+          # no_check_certificate: the server's Let's Encrypt cert is expired.
+          export RCLONE_CONFIG_DEPLOY_TYPE=ftp
+          export RCLONE_CONFIG_DEPLOY_HOST="$FTP_HOST"
+          export RCLONE_CONFIG_DEPLOY_USER="$FTP_USER"
+          export RCLONE_CONFIG_DEPLOY_PASS="$(rclone obscure "$FTP_PASSWORD")"
+          export RCLONE_CONFIG_DEPLOY_EXPLICIT_TLS=true
+          export RCLONE_CONFIG_DEPLOY_NO_CHECK_CERTIFICATE=true
+          rclone sync site/html "deploy:$FTP_DOCROOT" -v --transfers 2
