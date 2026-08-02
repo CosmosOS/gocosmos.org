@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    # CI-only commits don't redeploy the site
-    paths-ignore:
-      - ".gitea/**"
 
 jobs:
   deploy:
@@ -38,7 +35,8 @@ jobs:
           # verify-certificate off: the server's Let's Encrypt cert is expired.
           # TLS 1.2 forced: lftp/gnutls fails TLS 1.3 session reuse on the data
           # channel with this server (gnutls_record_recv: unexpected TLS packet).
-          lftp -u "$FTP_USER,$FTP_PASSWORD" "$FTP_HOST" -e "
+          # -d: full FTP/TLS dialogue in the log (lftp masks the password)
+          lftp -d -u "$FTP_USER,$FTP_PASSWORD" "$FTP_HOST" -e "
             set ftp:ssl-force true;
             set ftp:ssl-protect-data true;
             set ssl:priority NORMAL:-VERS-TLS1.3;
