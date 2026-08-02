@@ -1,5 +1,7 @@
 name: Deploy
 on:
+  # Manual trigger from the Actions UI (first deploy, redeploy without a commit)
+  workflow_dispatch:
   push:
     branches: [master]
     # CI-only commits don't redeploy the site
@@ -9,21 +11,33 @@ on:
 jobs:
   deploy:
     runs-on: deploy
-    # the docker:cli job image is alpine-based: sh, not bash
-    defaults:
-      run:
-        shell: sh
+    # Build needs node; overrides the runner's default docker:cli image
+    container: node:22-bookworm
     steps:
-      - name: Sync deploy clone and redeploy
+      - name: Clone and build
         run: |
           set -e
-          DEPLOY_DIR=/mnt/sda1/Users/amnesia/Docker/Websites/DevValentinBzh-deploy
           REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@git.amnesia.cloud/${{ github.repository }}.git"
-          if [ ! -d "$DEPLOY_DIR/.git" ]; then
-            git clone --branch master "$REPO_URL" "$DEPLOY_DIR"
-          fi
-          cd "$DEPLOY_DIR"
-          git remote set-url origin "$REPO_URL"
-          git fetch origin master
-          git reset --hard origin/master
-          docker compose -p devvalentinbzh up -d --build
+          git clone --depth 1 --branch master "$REPO_URL" site
+          cd site
+          npm ci
+          npm run build
+
+      - name: Push html/ to gocosmos.org over FTP
+        env:
+          FTP_HOST: 000.web.punksky.com
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          # Adjust if punksky's docroot differs (htdocs, www, ...)
+          FTP_DOCROOT: public_html
+        run: |
+          set -e
+          apt-get update -qq && apt-get install -y -qq lftp
+          # --delete prunes stale hashed assets so the 256 MB quota never fills;
+          # it also removes anything else in the docroot not present in html/.
+          # Shared-hosting certs rarely match the FTP hostname, hence verify off.
+          lftp -u "$FTP_USER,$FTP_PASSWORD" "$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ssl:verify-certificate no;
+            mirror -R --delete --parallel=4 site/html/ $FTP_DOCROOT/;
+            quit"
