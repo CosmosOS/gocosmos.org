@@ -10,6 +10,7 @@ import { Hero } from './components/Hero';
 import { Features } from './components/Features';
 import { Timeline } from './components/Timeline';
 import { Contributors } from './components/Contributors';
+import { Projects } from './components/Projects';
 import { Community } from './components/Community';
 import { Footer } from './components/Footer';
 
@@ -26,6 +27,7 @@ export function App() {
         <Features />
         <Timeline />
         <Contributors />
+        <Projects />
         <Community />
       </main>
       <Footer />
