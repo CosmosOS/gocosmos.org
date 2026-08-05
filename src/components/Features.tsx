@@ -67,8 +67,10 @@ export function Features() {
               </div>
             </div>
             <ul className="readout-specs">
+              {/* onClick focus: insurance for browsers that don't focus a
+                  tapped tabindex element — :focus-within drives the reveal. */}
               {SPECS.map(s => (
-                <li key={s.key} className="spec-row" tabIndex={0}>
+                <li key={s.key} className="spec-row" tabIndex={0} onClick={e => e.currentTarget.focus()}>
                   <div className="spec-line">
                     <span className="spec-key">{s.key}</span>
                     <span className="spec-value">{s.value}</span>

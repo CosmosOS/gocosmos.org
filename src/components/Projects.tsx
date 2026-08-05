@@ -83,6 +83,14 @@ function mergeProjects(results: { list: ApiRepo[]; gen: Gen }[]): Project[] {
 export function Projects() {
   const [list, setList] = useState<Project[] | null>(null);
   const [errored, setErrored] = useState(false);
+  // Touch accordion: rows are links, so on hoverless devices the first tap
+  // expands the description and only a second tap follows the link.
+  const [touch, setTouch] = useState(false);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    setTouch(window.matchMedia('(hover: none)').matches);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,7 +135,13 @@ export function Projects() {
           <ol className="proj-list" style={{ gridTemplateRows: `repeat(${Math.ceil(display.length / 2)}, auto)` }}>
             {display.map((p, i) => (
               <li key={`${p.owner}/${p.name}`}>
-                <a className="proj-row" href={p.html_url} target="_blank" rel="noreferrer">
+                <a
+                  className={`proj-row${touch && openIdx === i ? ' open' : ''}`}
+                  href={p.html_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={touch && openIdx !== i ? e => { e.preventDefault(); setOpenIdx(i); } : undefined}
+                >
                   <span className="proj-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <span className="proj-main">
                     <span className="proj-line">

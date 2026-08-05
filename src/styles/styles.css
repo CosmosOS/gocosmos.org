@@ -610,8 +610,8 @@ html.js .nav-cta:not(.is-visible) {
   outline: none; cursor: default;
   transition: background var(--dur-fast);
 }
-.spec-row:hover, .spec-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
-[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
+.spec-row:hover, .spec-row:focus-within { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-within { background: rgba(20, 20, 35, 0.06); }
 .spec-line { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
 .spec-key { color: var(--halo, #F2EBDA); min-width: 6ch; flex-shrink: 0; }
 [data-theme='light'] .spec-key { color: var(--fg-1); font-weight: 600; }
@@ -630,12 +630,9 @@ html.js .nav-cta:not(.is-visible) {
   color: var(--fg-2); font-size: max(11px, 0.88em); line-height: 1.6;
   max-width: 76ch;
 }
-/* Hover-expand is a pointer affordance — on touch devices show the
-   descriptions expanded instead. */
-@media (hover: none) {
-  .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
-  .spec-row:hover, .spec-row:focus-visible { background: transparent; }
-}
+/* On touch there is no hover — rows start collapsed and a tap expands:
+   the li carries tabindex, tapping focuses it and :focus-within above does
+   the rest (tapping another row moves focus and collapses this one). */
 @media (max-width: 560px) { .spec-desc { padding-left: 0; } }
 
 /* ============================================================
@@ -755,10 +752,12 @@ html.js .nav-cta:not(.is-visible) {
   display: grid; grid-template-rows: 0fr; margin-top: 0;
   transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
 }
-.proj-row:hover .proj-desc-wrap, .proj-row:focus-visible .proj-desc-wrap { grid-template-rows: 1fr; margin-top: 3px; }
-@media (hover: none) {
-  .proj-desc-wrap { grid-template-rows: 1fr; margin-top: 3px; }
-}
+/* .open is the touch accordion state (set in Projects.tsx): rows are links,
+   so the first tap expands instead of navigating and the second follows. */
+.proj-row:hover .proj-desc-wrap, .proj-row:focus-visible .proj-desc-wrap, .proj-row.open .proj-desc-wrap { grid-template-rows: 1fr; margin-top: 3px; }
+.proj-row.open { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .proj-row.open { background: rgba(20, 20, 35, 0.06); }
+.proj-row.open .proj-name { text-decoration: underline; text-underline-offset: 3px; }
 .proj-desc {
   display: block; overflow: hidden; min-height: 0;
   font-size: max(11px, 0.75em); line-height: 1.55; color: var(--fg-2);
