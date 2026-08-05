@@ -111,7 +111,7 @@ export function Projects() {
   const display = list && list.length > 0 ? list : FALLBACK;
 
   return (
-    <section className="section section-tinted" id="projects">
+    <section className="section" id="projects">
       <div className="container">
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// built with cosmos</div>

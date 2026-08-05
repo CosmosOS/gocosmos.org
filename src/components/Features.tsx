@@ -44,7 +44,7 @@ const ART = [
 
 export function Features() {
   return (
-    <section className="section" id="features">
+    <section className="section section-tinted" id="features">
       <div className="container">
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// what's inside</div>
@@ -54,7 +54,6 @@ export function Features() {
         <div className="readout" data-reveal>
           <div className="readout-side">
             <pre className="readout-art" aria-hidden="true">{ART}</pre>
-            <div className="cs-eyebrow">// cosmos@gen3</div>
             <div className="readout-tags">
               <span className="readout-tag">C# 14</span>
               <span className="readout-tag">NativeAOT</span>

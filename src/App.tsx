@@ -24,8 +24,8 @@ export function App() {
       <Nav />
       <main>
         <Hero />
-        <Projects />
         <Features />
+        <Projects />
         <Timeline />
         <Contributors />
         <Community />

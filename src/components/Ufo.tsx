@@ -71,7 +71,7 @@ export function Ufo() {
     // shrink the UFO ("flies away") when it drifts behind one.
     // .readout-tags deliberately absent: the pills read fine with the saucer
     // behind them, so it only shies away from the readout's bare text.
-    const SHY_SELECTOR = '.hero-title, .hero-sub, .section-head, .section-sub, .era-title, .era-desc, .era-meta, .footer-tagline, .footer-cols, .footer-fine, .footer-brand, .readout-art, .readout-side .cs-eyebrow, .readout-specs';
+    const SHY_SELECTOR = '.hero-title, .hero-sub, .section-head, .section-sub, .era-title, .era-desc, .era-meta, .footer-tagline, .footer-cols, .footer-fine, .footer-brand, .readout-art, .readout-specs';
     const SHY_PAD = 24;
     const MIN_SCALE = 0.4;
     const tugs = new WeakMap<HTMLElement, { x: number; y: number; o: number }>();
