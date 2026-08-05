@@ -570,37 +570,84 @@ html.js .nav-cta:not(.is-visible) {
 [data-theme='light'] .era-title.hero-accent { color: var(--fg-1); }
 
 /* ============================================================
-   Features
+   Features — system readout (neofetch-style `cosmos --info`)
+   No window frame: the readout sits directly on the page, so
+   everything is theme tokens. Same width as the hero terminal
+   (full container).
    ============================================================ */
-.feature-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+.readout {
+  display: grid; grid-template-columns: auto 1fr; gap: 12px 72px;
+  padding: 12px 10px;
+  font-family: var(--font-mono); text-align: left;
 }
-@media (max-width: 1024px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .readout { grid-template-columns: 1fr; gap: 28px; padding: 0; }
+  .readout-side { justify-self: center; text-align: center; }
+  .readout-tags { justify-content: center; }
+}
 
-.feature-card {
-  position: relative;
-  border-radius: 18px;
-  padding: 26px 24px 24px;
-  transition: border-color var(--dur-fast) var(--ease-inout), box-shadow var(--dur-fast), transform var(--dur-fast);
+.readout-side { color: var(--fg-3); font-size: 12px; line-height: 1.7; align-self: start; }
+.readout-art {
+  margin: 0 0 16px; font-family: inherit;
+  font-size: 11px; line-height: 1.3;
+  color: var(--halo, #F2EBDA); opacity: 0.92;
 }
-@media (hover: hover) {
-  .feature-card.glass:hover {
-    border-color: rgba(255, 255, 255, 0.22);
-    transform: translateY(-2px);
-  }
-  [data-theme='light'] .feature-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
+@media (max-width: 720px) {
+  .readout-art { display: table; margin: 0 auto 16px; font-size: 9.5px; }
 }
-.feature-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--halo, #F2EBDA); margin-bottom: 18px;
-  position: relative; z-index: 1;
+[data-theme='light'] .readout-art { color: var(--fg-1); opacity: 0.85; }
+/* Caption under the art: centered on the art's width, with clear air
+   between it and the comet's tail. */
+.readout-side .cs-eyebrow { margin: 28px 0 14px; text-align: center; }
+.readout-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+/* Same pill recipe as the timeline's .era-tag. */
+.readout-tag {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 999px;
+  background: var(--bg-3); color: var(--fg-2); border: 1px solid var(--border-1);
+  letter-spacing: 0.04em;
 }
-[data-theme='light'] .feature-icon { color: var(--fg-1); }
-.feature-icon svg { width: 16px; height: 16px; }
-.feature-title { font-size: 15px; font-weight: 600; color: var(--fg-1); margin: 0 0 6px; letter-spacing: -0.01em; }
-.feature-desc { font-size: 13.5px; line-height: 1.55; color: var(--fg-2); margin: 0; }
+
+.readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; }
+.spec-row {
+  padding: 7px 12px; margin: 0 -12px; border-radius: 8px;
+  outline: none; cursor: default;
+  transition: background var(--dur-fast);
+}
+.spec-row:hover, .spec-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
+.spec-line { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+.spec-key { color: var(--halo, #F2EBDA); font-size: 12.5px; min-width: 64px; flex-shrink: 0; }
+[data-theme='light'] .spec-key { color: var(--fg-1); font-weight: 600; }
+.spec-value { color: var(--fg-1); font-size: 13px; }
+/* 0fr → 1fr height animation; the clipped <p> must carry no vertical
+   padding/margin or the track can't collapse to zero. */
+.spec-desc {
+  display: grid; grid-template-rows: 0fr; margin-top: 0;
+  transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
+}
+.spec-row:hover .spec-desc, .spec-row:focus-within .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
+.spec-desc p {
+  overflow: hidden; min-height: 0; margin: 0; padding: 0 0 0 82px;
+  color: var(--fg-2); font-size: 12px; line-height: 1.6;
+  max-width: 76ch;
+}
+/* Hover-expand is a pointer affordance — on touch devices show the
+   descriptions expanded instead. */
+@media (hover: none) {
+  .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
+  .spec-row:hover, .spec-row:focus-visible { background: transparent; }
+}
+@media (max-width: 560px) { .spec-desc p { padding-left: 0; } }
+
+.spec-prompt { margin-top: 14px; padding: 7px 12px 0; color: var(--fg-3); font-size: 12.5px; }
+.spec-cursor {
+  display: inline-block; width: 8px; height: 13px; margin-left: 2px;
+  background: var(--fg-1); vertical-align: text-bottom;
+  animation: cursor-blink 1.1s steps(1) infinite;
+}
+@keyframes cursor-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .spec-cursor { animation: none; } }
 
 /* ============================================================
    Timeline
@@ -796,7 +843,6 @@ html.js .nav-cta:not(.is-visible) {
    ============================================================ */
 .btn:active,
 .icon-btn:active,
-.feature-card.glass:active,
 .link-card.glass:active,
 .project-card.glass:active,
 .avatar:active {
