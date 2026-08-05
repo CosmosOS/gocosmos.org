@@ -20,24 +20,23 @@ jobs:
           npm ci
           npm run build
 
-      - name: Push html/ to gocosmos.org over FTP
+      - name: Push html/ to gocosmos.org over SFTP
         env:
-          FTP_HOST: 000.web.punksky.com
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          # Adjust if punksky's docroot differs (htdocs, www, ...)
-          FTP_DOCROOT: public_html
+          SFTP_HOST: 000.web.punksky.com
+          SFTP_USER: ${{ secrets.FTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          SFTP_DOCROOT: web/gocosmos.org/public_html
         run: |
           set -e
           apt-get update -qq && apt-get install -y -qq rclone
-          # rclone (Go TLS) instead of lftp: this server breaks the gnutls
-          # session right after PASS. sync mirrors html/ and prunes stale
-          # hashed assets so the 256 MB quota never fills.
-          # no_check_certificate: the server's Let's Encrypt cert is expired.
-          export RCLONE_CONFIG_DEPLOY_TYPE=ftp
-          export RCLONE_CONFIG_DEPLOY_HOST="$FTP_HOST"
-          export RCLONE_CONFIG_DEPLOY_USER="$FTP_USER"
-          export RCLONE_CONFIG_DEPLOY_PASS="$(rclone obscure "$FTP_PASSWORD")"
-          export RCLONE_CONFIG_DEPLOY_EXPLICIT_TLS=true
-          export RCLONE_CONFIG_DEPLOY_NO_CHECK_CERTIFICATE=true
-          rclone sync site/html "deploy:$FTP_DOCROOT" -v --transfers 2
+          # SFTP, not FTP: punksky's FTP backend can't enter this account's
+          # jail (500 OOPS: cannot change directory:/srv/jail/<user>) and
+          # drops TLS right after PASS, which killed both lftp and rclone.
+          # The same credentials work over SSH on port 22, where the docroot
+          # is web/gocosmos.org/public_html. sync mirrors html/ and prunes
+          # stale hashed assets so the 256 MB quota never fills.
+          export RCLONE_CONFIG_DEPLOY_TYPE=sftp
+          export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
+          export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
+          export RCLONE_CONFIG_DEPLOY_PASS="$(rclone obscure "$SFTP_PASSWORD")"
+          rclone sync site/html "deploy:$SFTP_DOCROOT" -v --transfers 2
