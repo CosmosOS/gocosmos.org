@@ -60,9 +60,10 @@ export function Features() {
             <div className="readout-side">
               <pre className="readout-art" aria-hidden="true">{ART}</pre>
               <div className="readout-tags">
-                <span className="readout-tag">C# 14</span>
-                <span className="readout-tag">NativeAOT</span>
-                <span className="readout-tag">Limine</span>
+                <span className="gen-pill glass">C# 14</span>
+                <span className="gen-pill glass">.NET 10</span>
+                <span className="gen-pill glass">NativeAOT</span>
+                <span className="gen-pill glass">Limine</span>
               </div>
             </div>
             <ul className="readout-specs">

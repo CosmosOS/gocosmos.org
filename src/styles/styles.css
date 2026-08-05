@@ -597,13 +597,6 @@ html.js .nav-cta:not(.is-visible) {
 /* Caption under the art: centered on the art's width, with clear air
    between it and the comet's tail. */
 .readout-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 28px; }
-/* Same pill recipe as the timeline's .era-tag. */
-.readout-tag {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  padding: 4px 10px; border-radius: 999px;
-  background: var(--bg-3); color: var(--fg-2); border: 1px solid var(--border-1);
-  letter-spacing: 0.04em;
-}
 
 /* One notch under the cast size — full 1em on sentence-length values reads
    much heavier than the projects listing's short slugs, so the specs sit
