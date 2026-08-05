@@ -541,6 +541,7 @@ html.js .nav-cta:not(.is-visible) {
   #features { contain-intrinsic-size: auto 2100px; }
   #timeline { contain-intrinsic-size: auto 1000px; }
   #community { contain-intrinsic-size: auto 1100px; }
+  #projects { contain-intrinsic-size: auto 1250px; }
 }
 .section-tinted { background: linear-gradient(180deg, transparent 0%, rgba(15, 15, 21, 0.5) 50%, transparent 100%); }
 [data-theme='light'] .section-tinted { background: none; }
@@ -575,13 +576,16 @@ html.js .nav-cta:not(.is-visible) {
    everything is theme tokens. Same width as the hero terminal
    (full container).
    ============================================================ */
+/* Shared chrome for the terminal sections (Features + Projects):
+   same inset, same command line, one idle prompt at the very end. */
+.term-block { font-family: var(--font-mono); padding: 12px 10px; text-align: left; }
+.term-cmd { font-size: 12.5px; color: var(--fg-1); margin: 0 0 18px; }
+
 .readout {
   display: grid; grid-template-columns: auto 1fr; gap: 12px 72px;
-  padding: 12px 10px;
-  font-family: var(--font-mono); text-align: left;
 }
 @media (max-width: 720px) {
-  .readout { grid-template-columns: 1fr; gap: 28px; padding: 0; }
+  .readout { grid-template-columns: 1fr; gap: 28px; }
   .readout-side { justify-self: center; text-align: center; }
   .readout-tags { justify-content: center; }
 }
@@ -638,15 +642,6 @@ html.js .nav-cta:not(.is-visible) {
   .spec-row:hover, .spec-row:focus-visible { background: transparent; }
 }
 @media (max-width: 560px) { .spec-desc p { padding-left: 0; } }
-
-.spec-prompt { margin-top: 14px; padding: 7px 12px 0; color: var(--fg-3); font-size: 12.5px; }
-.spec-cursor {
-  display: inline-block; width: 8px; height: 13px; margin-left: 2px;
-  background: var(--fg-1); vertical-align: text-bottom;
-  animation: cursor-blink 1.1s steps(1) infinite;
-}
-@keyframes cursor-blink { 50% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .spec-cursor { animation: none; } }
 
 /* ============================================================
    Timeline
@@ -717,47 +712,50 @@ html.js .nav-cta:not(.is-visible) {
 }
 
 /* ============================================================
-   Featured projects
+   Featured projects — `ls community/` readout
+   Same frameless terminal language as the Features readout:
+   mono, theme tokens, hover rows. The listing flows down then
+   across (multicol), so the star ranking reads top-to-bottom.
    ============================================================ */
-.project-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+.proj-list {
+  list-style: none; margin: 0; padding: 0;
+  column-count: 2; column-gap: 72px;
 }
-@media (max-width: 880px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .project-grid { grid-template-columns: 1fr; } }
+@media (max-width: 880px) { .proj-list { column-count: 1; } }
+.proj-list li { break-inside: avoid; }
 
-.project-card {
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 20px;
-  border-radius: 14px;
+.proj-row {
+  display: flex; gap: 14px; align-items: baseline;
+  padding: 9px 12px; margin: 0 -12px; border-radius: 8px;
   text-decoration: none; color: inherit;
-  transition: border-color var(--dur-fast), transform var(--dur-fast);
+  transition: background var(--dur-fast);
 }
-@media (hover: hover) {
-  .project-card.glass:hover {
-    border-color: rgba(255, 255, 255, 0.22);
-    transform: translateY(-2px);
-  }
-  [data-theme='light'] .project-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
-}
-.project-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.project-owner {
-  font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-3);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.project-name { font-size: 15px; font-weight: 600; color: var(--fg-1); letter-spacing: -0.01em; margin: 0; }
-.project-desc { font-size: 13px; line-height: 1.5; color: var(--fg-2); margin: 0; flex: 1; }
-.project-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
-.project-topics { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
-.project-topic {
-  font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-3);
-  padding: 2px 8px; border-radius: 999px;
-  background: var(--bg-3); border: 1px solid var(--border-1);
-}
-.project-stars {
+.proj-row:hover, .proj-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .proj-row:hover, [data-theme='light'] .proj-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
+
+.proj-idx { font-size: 11px; color: var(--fg-3); flex-shrink: 0; }
+.proj-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.proj-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.proj-slug { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.proj-owner { color: var(--fg-3); font-size: 11.5px; }
+.proj-name { color: var(--halo, #F2EBDA); font-weight: 600; }
+[data-theme='light'] .proj-name { color: var(--fg-1); }
+.proj-row:hover .proj-name, .proj-row:focus-visible .proj-name { text-decoration: underline; text-underline-offset: 3px; }
+
+.proj-stars {
   display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
-  font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-3);
+  font-size: 11.5px; color: var(--fg-3);
 }
-.project-stars svg { width: 12px; height: 12px; }
+.proj-stars svg { width: 12px; height: 12px; }
+
+.proj-desc {
+  font-size: 12px; line-height: 1.55; color: var(--fg-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.proj-topics { color: var(--fg-3); font-size: 11px; }
+
+.proj-foot { margin-top: 16px; font-size: 12px; color: var(--fg-3); }
+.proj-foot-topic { color: var(--fg-1); }
 
 /* ============================================================
    Community links

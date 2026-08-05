@@ -120,30 +120,37 @@ export function Projects() {
             ? 'Projects couldn’t load from GitHub — showing a snapshot. Live on the marketing site.'
             : 'Don’t know where to start? See these projects to learn Cosmos by example and for inspiration!'}</p>
         </div>
-        <div className="project-grid" data-reveal>
-          {display.map(p => {
-            return (
-              <a
-                key={`${p.owner}/${p.name}`}
-                className="project-card glass"
-                href={p.html_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="project-top">
-                  <span className="project-owner">{p.owner}/</span>
-                </div>
-                <h3 className="project-name">{p.name}</h3>
-                <p className="project-desc">{p.description}</p>
-                <div className="project-meta">
-                  <div className="project-topics">
-                    {p.topics.map(t => <span key={t} className="project-topic">{t}</span>)}
-                  </div>
-                  <span className="project-stars">{ICONS.star}{p.stars}</span>
-                </div>
-              </a>
-            );
-          })}
+        <div className="term-block" data-reveal>
+          <div className="term-cmd" aria-hidden="true">
+            ls community/ --sort=stars
+          </div>
+          <ol className="proj-list">
+            {display.map((p, i) => (
+              <li key={`${p.owner}/${p.name}`}>
+                <a className="proj-row" href={p.html_url} target="_blank" rel="noreferrer">
+                  <span className="proj-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="proj-main">
+                    <span className="proj-line">
+                      <span className="proj-slug">
+                        <span className="proj-owner">{p.owner}/</span>
+                        <span className="proj-name">{p.name}</span>
+                      </span>
+                      <span className="proj-stars">{ICONS.star}{p.stars}</span>
+                    </span>
+                    <span className="proj-desc">
+                      {p.description}
+                      {p.topics.length > 0 && (
+                        <span className="proj-topics">{' '}{p.topics.map(t => `#${t}`).join(' ')}</span>
+                      )}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+          <div className="proj-foot" aria-hidden="true">
+            {display.length} repos · {errored ? 'snapshot' : 'live from GitHub'} · tag yours <span className="proj-foot-topic">cosmos-os</span> to appear here
+          </div>
         </div>
       </div>
     </section>

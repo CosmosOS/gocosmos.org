@@ -51,29 +51,31 @@ export function Features() {
           <h2 className="cs-h1">Everything you need to boot C# on bare metal.</h2>
           <p className="section-sub">Gen3 replaces IL2CPU with the official .NET toolchain. Everything above it: GC, scheduler, drivers, network, filesystem is C# you can read, plug or replace.</p>
         </div>
-        <div className="readout" data-reveal>
-          <div className="readout-side">
-            <pre className="readout-art" aria-hidden="true">{ART}</pre>
-            <div className="readout-tags">
-              <span className="readout-tag">C# 14</span>
-              <span className="readout-tag">NativeAOT</span>
-              <span className="readout-tag">Limine</span>
-            </div>
+        <div className="term-block" data-reveal>
+          <div className="term-cmd" aria-hidden="true">
+            cosmos --info
           </div>
-          <ul className="readout-specs">
-            {SPECS.map(s => (
-              <li key={s.key} className="spec-row" tabIndex={0}>
-                <div className="spec-line">
-                  <span className="spec-key">{s.key}</span>
-                  <span className="spec-value">{s.value}</span>
-                </div>
-                <div className="spec-desc"><p>{s.desc}</p></div>
-              </li>
-            ))}
-            <li className="spec-prompt" aria-hidden="true">
-              cosmos@gen3:~$ <span className="spec-cursor" />
-            </li>
-          </ul>
+          <div className="readout">
+            <div className="readout-side">
+              <pre className="readout-art" aria-hidden="true">{ART}</pre>
+              <div className="readout-tags">
+                <span className="readout-tag">C# 14</span>
+                <span className="readout-tag">NativeAOT</span>
+                <span className="readout-tag">Limine</span>
+              </div>
+            </div>
+            <ul className="readout-specs">
+              {SPECS.map(s => (
+                <li key={s.key} className="spec-row" tabIndex={0}>
+                  <div className="spec-line">
+                    <span className="spec-key">{s.key}</span>
+                    <span className="spec-value">{s.value}</span>
+                  </div>
+                  <div className="spec-desc"><p>{s.desc}</p></div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
