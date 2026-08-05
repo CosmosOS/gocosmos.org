@@ -24,10 +24,10 @@ export function App() {
       <Nav />
       <main>
         <Hero />
+        <Projects />
         <Features />
         <Timeline />
         <Contributors />
-        <Projects />
         <Community />
       </main>
       <Footer />

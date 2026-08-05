@@ -17,8 +17,7 @@ const LINKS: CommunityLink[] = [
 
 export function Community() {
   return (
-    // Untinted: Projects above it is tinted, keeping the section alternation.
-    <section className="section" id="community">
+    <section className="section section-tinted" id="community">
       <div className="container">
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// community &amp; links</div>

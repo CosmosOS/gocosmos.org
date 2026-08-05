@@ -34,9 +34,9 @@ export function Nav() {
           <img src="/assets/cosmos-logo.png" alt="Cosmos" />
         </a>
         <nav className="nav-links">
+          <a href="#projects">Projects</a>
           <a href="#features">Features</a>
           <a href="#timeline">History</a>
-          <a href="#projects">Projects</a>
           <a href="#community">Community</a>
         </nav>
         <div className="nav-actions">
