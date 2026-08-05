@@ -440,35 +440,12 @@ html.js .nav-cta:not(.is-visible) {
   margin-bottom: 64px;
 }
 
-/* Hero terminal — full container width, same as the section grids. The
-   surface itself (background, border, shadow) comes from .glass so it
-   matches the rest of the design in both themes. */
-/* No overflow:hidden here — it would clip the .glass::after edge glint,
-   which sits on the border ring. The children round their own corners
-   (outer 14px minus the 1px glass border). */
-.terminal {
-  margin: 0 auto;
-  border-radius: 14px;
-  text-align: left;
-}
-/* Divider tracks the glass surface, not var(--border-1) — the token flips
-   to near-white in light mode, which read as a white line in the window. */
-.term-bar {
-  display: flex; align-items: center; gap: 7px;
-  padding: 11px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 13px 13px 0 0;
-}
-[data-theme='light'] .term-bar {
-  border-bottom-color: rgba(20, 20, 35, 0.10);
-  background: rgba(20, 20, 35, 0.04);
-}
-.term-dot { width: 11px; height: 11px; border-radius: 50%; }
-.term-title { margin-left: 12px; font-family: var(--font-mono); font-size: 11px; color: #6E6E85; }
-/* The screen is opaque near-black in both themes, like a real terminal —
-   only the window frame (bar, border, shadow) is glass. */
-.term-player { padding: 0; border-radius: 0 0 13px 13px; overflow: hidden; background: #0B0B11; }
-/* Asciinema player, restyled to sit inside the hero terminal frame. */
+/* Hero boot-log — frameless: no window bar, no screen surface. The cast's
+   glyphs paint straight on the page background (cell background is
+   transparent in the palette below), colors as recorded. text-align:left
+   guards against the hero's centered text reaching into the pre lines. */
+.term-player { text-align: left; }
+/* Asciinema player, restyled to sit bare on the page. */
 .term-player .ap-wrapper { background: transparent; }
 .term-player .ap-player { border-radius: 0; }
 /* Playback starts via IntersectionObserver — hide the big start overlay.
@@ -500,12 +477,14 @@ html.js .nav-cta:not(.is-visible) {
   --term-color-14: #7DE3EF;
   --term-color-15: #F5F5FA;
 }
-/* The palette above is intentionally NOT theme-dependent: the player
-   snapshots it into JS at creation and paints colored spans with inline
-   `style.color` — only default-colored text follows the live CSS var, so
-   a light-mode palette desyncs (dark plain text, snapshot-bright colored
-   text). The screen keeps the classic dark look in both themes instead
-   (opaque background on .term-player); glass is the window, not the screen. */
+/* Colored spans are snapshotted into inline `style.color` at creation, so
+   they keep the recorded palette in both themes. Only default-colored text
+   follows the live CSS var — and with no screen surface behind the glyphs
+   anymore, near-white plain text would vanish on the light background, so
+   re-ink just the foreground there. */
+[data-theme='light'] .asciinema-player-theme-cosmos.asciinema-player-theme-cosmos {
+  --term-color-foreground: #1C1C20;
+}
 /* The transparent --term-color-background above also feeds the player's
    overlays: tooltips, the PAUSED flash, and the kbd keycaps (help panel and
    keystroke overlay) all paint their TEXT in background-color on a
@@ -578,8 +557,20 @@ html.js .nav-cta:not(.is-visible) {
    ============================================================ */
 /* Shared chrome for the terminal sections (Features + Projects):
    same inset, same command line, one idle prompt at the very end. */
-.term-block { font-family: var(--font-mono); padding: 12px 10px; text-align: left; }
-.term-cmd { font-size: 12.5px; color: var(--fg-1); margin: 0 0 18px; }
+/* Same glyph size as the hero cast: the player fits 100 cols into the
+   container (1200px cap minus 2×32px padding) and JetBrains Mono advances
+   0.6em, so its font-size is (container - 64px) / 60 ≈ 18.9px at the cap.
+   The whole block scales with it — primary lines at 1em, secondary text in
+   em with px floors so it stays readable where the cast shrinks below. */
+.term-block {
+  font-family: var(--font-mono); padding: 12px 10px; text-align: left;
+  font-size: clamp(12.5px, calc((100vw - 64px) / 60), 18.9px);
+}
+.term-cmd { font-size: 1em; color: var(--fg-1); margin: 0 0 18px; }
+/* Prompt inks match the hero cast exactly (bold SGR 32/34 over the cosmos
+   palette) and, like the cast's colored spans, don't change with the theme. */
+.term-user { color: #3DDC84; font-weight: 700; }
+.term-path { color: #6CA4F8; font-weight: 700; }
 
 .readout {
   display: grid; grid-template-columns: auto 1fr; gap: 12px 72px;
@@ -593,7 +584,10 @@ html.js .nav-cta:not(.is-visible) {
 .readout-side { color: var(--fg-3); font-size: 12px; line-height: 1.7; align-self: start; }
 .readout-art {
   margin: 0 0 16px; font-family: inherit;
-  font-size: 11px; line-height: 1.3;
+  /* Tracks the block's cast-size formula at ~0.78× so the planet fills the
+     left column without squeezing the specs at narrower widths. */
+  font-size: clamp(9.5px, calc((100vw - 64px) / 77), 14.8px);
+  line-height: 1.3;
   color: var(--halo, #F2EBDA); opacity: 0.92;
 }
 @media (max-width: 720px) {
@@ -611,7 +605,10 @@ html.js .nav-cta:not(.is-visible) {
   letter-spacing: 0.04em;
 }
 
-.readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; }
+/* One notch under the cast size — full 1em on sentence-length values reads
+   much heavier than the projects listing's short slugs, so the specs sit
+   between the command line (1em) and the hover descriptions. */
+.readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; font-size: 0.85em; }
 .spec-row {
   padding: 7px 12px; margin: 0 -12px; border-radius: 8px;
   outline: none; cursor: default;
@@ -620,19 +617,21 @@ html.js .nav-cta:not(.is-visible) {
 .spec-row:hover, .spec-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
 [data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
 .spec-line { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
-.spec-key { color: var(--halo, #F2EBDA); font-size: 12.5px; min-width: 64px; flex-shrink: 0; }
+.spec-key { color: var(--halo, #F2EBDA); min-width: 6ch; flex-shrink: 0; }
 [data-theme='light'] .spec-key { color: var(--fg-1); font-weight: 600; }
-.spec-value { color: var(--fg-1); font-size: 13px; }
+.spec-value { color: var(--fg-1); }
 /* 0fr → 1fr height animation; the clipped <p> must carry no vertical
-   padding/margin or the track can't collapse to zero. */
+   padding/margin or the track can't collapse to zero. The left inset lives
+   here (at 1em, in ch) so the desc aligns under the value column. */
 .spec-desc {
   display: grid; grid-template-rows: 0fr; margin-top: 0;
+  padding-left: calc(6ch + 18px);
   transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
 }
 .spec-row:hover .spec-desc, .spec-row:focus-within .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
 .spec-desc p {
-  overflow: hidden; min-height: 0; margin: 0; padding: 0 0 0 82px;
-  color: var(--fg-2); font-size: 12px; line-height: 1.6;
+  overflow: hidden; min-height: 0; margin: 0; padding: 0;
+  color: var(--fg-2); font-size: max(11px, 0.88em); line-height: 1.6;
   max-width: 76ch;
 }
 /* Hover-expand is a pointer affordance — on touch devices show the
@@ -641,7 +640,7 @@ html.js .nav-cta:not(.is-visible) {
   .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
   .spec-row:hover, .spec-row:focus-visible { background: transparent; }
 }
-@media (max-width: 560px) { .spec-desc p { padding-left: 0; } }
+@media (max-width: 560px) { .spec-desc { padding-left: 0; } }
 
 /* ============================================================
    Timeline
@@ -733,28 +732,28 @@ html.js .nav-cta:not(.is-visible) {
 .proj-row:hover, .proj-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
 [data-theme='light'] .proj-row:hover, [data-theme='light'] .proj-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
 
-.proj-idx { font-size: 11px; color: var(--fg-3); flex-shrink: 0; }
+.proj-idx { font-size: max(10.5px, 0.8em); color: var(--fg-3); flex-shrink: 0; }
 .proj-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .proj-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.proj-slug { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
-.proj-owner { color: var(--fg-3); font-size: 11.5px; }
+.proj-slug { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1em; }
+.proj-owner { color: var(--fg-3); font-size: max(11px, 0.85em); }
 .proj-name { color: var(--halo, #F2EBDA); font-weight: 600; }
 [data-theme='light'] .proj-name { color: var(--fg-1); }
 .proj-row:hover .proj-name, .proj-row:focus-visible .proj-name { text-decoration: underline; text-underline-offset: 3px; }
 
 .proj-stars {
   display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
-  font-size: 11.5px; color: var(--fg-3);
+  font-size: max(10.5px, 0.8em); color: var(--fg-3);
 }
-.proj-stars svg { width: 12px; height: 12px; }
+.proj-stars svg { width: 1em; height: 1em; }
 
 .proj-desc {
-  font-size: 12px; line-height: 1.55; color: var(--fg-2);
+  font-size: max(11px, 0.75em); line-height: 1.55; color: var(--fg-2);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.proj-topics { color: var(--fg-3); font-size: 11px; }
+.proj-topics { color: var(--fg-3); font-size: 0.92em; }
 
-.proj-foot { margin-top: 16px; font-size: 12px; color: var(--fg-3); }
+.proj-foot { margin-top: 16px; font-size: max(11px, 0.75em); color: var(--fg-3); }
 .proj-foot-topic { color: var(--fg-1); }
 
 /* ============================================================

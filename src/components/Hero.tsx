@@ -179,19 +179,11 @@ export function Hero() {
       </div>
 
       <div className="container">
-        <div className="terminal glass">
-          <div className="term-bar">
-            <span className="term-dot" style={{ background: '#FF6B6B' }} />
-            <span className="term-dot" style={{ background: '#FFB454' }} />
-            <span className="term-dot" style={{ background: '#3DDC84' }} />
-            <span className="term-title">cosmos@gen3 — cosmos build && cosmos run</span>
-          </div>
-          <div
-            className="term-player"
-            ref={playerRef}
-            aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
-          />
-        </div>
+        <div
+          className="term-player"
+          ref={playerRef}
+          aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
+        />
       </div>
     </section>
   );

@@ -12,7 +12,8 @@ const SPECS: Spec[] = [
   { key: 'kernel', value: 'GC · scheduler · exceptions', desc: 'Mark-and-sweep GC with precise stack scanning, a preemptive priority-based stride scheduler with lock support, exception handling with unwinding.' },
   { key: 'net', value: 'System.Net.Sockets', desc: 'TCP and UDP sockets over Cosmos’ own network stack: ARP, IPv4, DHCP and DNS. HTTPS/TLS is on the roadmap.' },
   { key: 'disk', value: 'System.IO down to the disk', desc: 'AHCI/SATA and NVMe drivers, MBR/GPT/EBR partitioning, FAT12/16/32 on a Unix-style VFS.' },
-  { key: 'gfx', value: 'Canvas · input · ACPI', desc: 'Double-buffered Canvas API on the UEFI GOP framebuffer (via Limine), keyboard and mouse input, ACPI through LAI, UART for serial debugging.' },
+  { key: 'gfx', value: 'Canvas · input', desc: 'Double-buffered Canvas API on the UEFI GOP framebuffer (via Limine), keyboard and mouse input.' },
+  { key: 'plat', value: 'ACPI · UART', desc: 'ACPI support through the LAI library, plus UART serial for logging and debugging the kernel.' },
 ];
 
 /* The -hrr- planet, same as the Cosmos VS Code extension prints after
@@ -53,7 +54,7 @@ export function Features() {
         </div>
         <div className="term-block" data-reveal>
           <div className="term-cmd" aria-hidden="true">
-            cosmos --info
+            <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ cosmos --info
           </div>
           <div className="readout">
             <div className="readout-side">

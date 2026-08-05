@@ -122,7 +122,7 @@ export function Projects() {
         </div>
         <div className="term-block" data-reveal>
           <div className="term-cmd" aria-hidden="true">
-            ls community/ --sort=stars
+            <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ ls community/ --sort=stars
           </div>
           <ol className="proj-list">
             {display.map((p, i) => (
