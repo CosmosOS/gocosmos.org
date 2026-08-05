@@ -124,7 +124,7 @@ export function Projects() {
           <div className="term-cmd" aria-hidden="true">
             <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ ls community/ --sort=stars
           </div>
-          <ol className="proj-list">
+          <ol className="proj-list" style={{ gridTemplateRows: `repeat(${Math.ceil(display.length / 2)}, auto)` }}>
             {display.map((p, i) => (
               <li key={`${p.owner}/${p.name}`}>
                 <a className="proj-row" href={p.html_url} target="_blank" rel="noreferrer">
@@ -137,11 +137,13 @@ export function Projects() {
                       </span>
                       <span className="proj-stars">{ICONS.star}{p.stars}</span>
                     </span>
-                    <span className="proj-desc">
-                      {p.description}
-                      {p.topics.length > 0 && (
-                        <span className="proj-topics">{' '}{p.topics.map(t => `#${t}`).join(' ')}</span>
-                      )}
+                    <span className="proj-desc-wrap">
+                      <span className="proj-desc">
+                        {p.description}
+                        {p.topics.length > 0 && (
+                          <span className="proj-topics">{' '}{p.topics.map(t => `#${t}`).join(' ')}</span>
+                        )}
+                      </span>
                     </span>
                   </span>
                 </a>
