@@ -123,8 +123,16 @@ export function Hero() {
             if (!started) {
               const height = entry.boundingClientRect.height || 1;
               const viewport = entry.rootBounds?.height ?? window.innerHeight;
-              const needed = Math.min(0.95, (viewport * 0.9) / height);
-              if (entry.intersectionRatio >= needed) {
+              // Compare vertical visibility only: on phones the player sits
+              // in a horizontal scroller that clips it sideways, capping
+              // intersectionRatio below any sane threshold forever. The cap
+              // drops to 0.85 when clipped so a 5%-step threshold is always
+              // crossed near the requirement (callbacks only fire on ratio
+              // steps, and the reachable ratio range shrinks with the clip).
+              const clipped = entry.intersectionRect.width < entry.boundingClientRect.width - 1;
+              const needed = Math.min(clipped ? 0.85 : 0.95, (viewport * 0.9) / height);
+              const verticalShare = entry.intersectionRect.height / height;
+              if (verticalShare >= needed) {
                 started = true;
                 inView = true;
                 play();
@@ -136,7 +144,7 @@ export function Hero() {
             }
           }
         },
-        { threshold: [0, 0.25, 0.5, 0.65, 0.8, 0.9, 0.95, 1] },
+        { threshold: Array.from({ length: 21 }, (_, i) => i * 0.05) },
       );
       observer.observe(node);
     });
@@ -179,11 +187,13 @@ export function Hero() {
       </div>
 
       <div className="container">
-        <div
-          className="term-player"
-          ref={playerRef}
-          aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
-        />
+        <div className="term-scroll">
+          <div
+            className="term-player"
+            ref={playerRef}
+            aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
+          />
+        </div>
       </div>
     </section>
   );

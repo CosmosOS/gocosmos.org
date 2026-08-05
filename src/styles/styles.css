@@ -445,6 +445,14 @@ html.js .nav-cta:not(.is-visible) {
    transparent in the palette below), colors as recorded. text-align:left
    guards against the hero's centered text reaching into the pre lines. */
 .term-player { text-align: left; }
+/* On phones, 100 cast columns squeezed into the viewport give a ~6px font
+   while the readouts floor at 11px+. Floor the cast too by keeping the
+   player at least 640px wide inside a horizontal scroller (~10.7px font),
+   like a code block. */
+@media (max-width: 720px) {
+  .term-scroll { overflow-x: auto; }
+  .term-player { min-width: 640px; }
+}
 /* Asciinema player, restyled to sit bare on the page. */
 .term-player .ap-wrapper { background: transparent; }
 .term-player .ap-player { border-radius: 0; }
