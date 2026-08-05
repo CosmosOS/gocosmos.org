@@ -122,8 +122,6 @@ export function Projects() {
         </div>
         <div className="project-grid" data-reveal>
           {display.map(p => {
-            const isGen3 = p.gens.has('gen3');
-            const isGen2 = p.gens.has('gen2');
             return (
               <a
                 key={`${p.owner}/${p.name}`}
@@ -134,10 +132,6 @@ export function Projects() {
               >
                 <div className="project-top">
                   <span className="project-owner">{p.owner}/</span>
-                  <span className="project-gens">
-                    {isGen2 && <span className="gen-badge gen-badge-g2" title="Built on Cosmos Gen2">G2</span>}
-                    {isGen3 && <span className="gen-badge gen-badge-g3" title="Built on Cosmos Gen3">G3</span>}
-                  </span>
                 </div>
                 <h3 className="project-name">{p.name}</h3>
                 <p className="project-desc">{p.description}</p>
