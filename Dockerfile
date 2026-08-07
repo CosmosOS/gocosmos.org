@@ -6,5 +6,5 @@ COPY . .
 RUN npm run build
 
 FROM php:8.2-apache
-RUN echo "ServerName dev.valentin.bzh" > /etc/apache2/conf-available/servername.conf && a2enconf servername
+RUN echo "ServerName gocosmos.org" > /etc/apache2/conf-available/servername.conf && a2enconf servername
 COPY --from=build /app/html /var/www/html
