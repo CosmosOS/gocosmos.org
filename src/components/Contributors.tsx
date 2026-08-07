@@ -21,7 +21,7 @@ interface Contributor {
 
 const FALLBACK = [
   'zarlo', 'kumja1', 'Guillermo-Santos', 'valentinbreiz', 'ascpixi', 'ilobilo',
-  'MishaProductions', 'placeholder1', 'placeholder2', 'placeholder3', 'placeholder4', 'placeholder5',
+  'MishaProductions',
 ];
 
 const REPOS: { slug: string; gen: Gen }[] = [
@@ -89,9 +89,9 @@ export function Contributors() {
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// the people</div>
           <h2 className="cs-h1">Built by the community.</h2>
-          <p className="section-sub">{errored
-            ? 'Avatars couldn’t load — placeholder grid below. Live on the marketing site.'
-            : 'Pulled live from the Cosmos (Gen2) and nativeaot-patcher (Gen3) repos. Click to visit a profile.'}</p>
+          <p className="section-sub" role="status">{errored
+            ? 'Avatars couldn’t load — showing a snapshot. Live data returns when GitHub is reachable again.'
+            : 'Pulled live from the Cosmos (Gen2) and nativeaot-patcher (Gen3) repos.'}</p>
         </div>
         <div className="avatar-wall" data-reveal>
           {display.map((c, i) => {
@@ -103,12 +103,15 @@ export function Contributors() {
                 href={c.html_url}
                 target="_blank"
                 rel="noreferrer"
+                // The label names the link (title alone is mouse-only and the
+                // fallback initials would otherwise be the accessible name).
+                aria-label={`${c.login} — GitHub profile${isGen3 ? ' (Gen3 contributor)' : ''}`}
                 title={c.login + (isGen3 ? ' (Gen3 contributor)' : '')}
               >
                 {c.avatar_url
-                  ? <img src={c.avatar_url} alt={c.login} loading="lazy" />
+                  ? <img src={c.avatar_url} alt="" loading="lazy" />
                   : <span className="avatar-fallback">{c.login.slice(0, 2).toUpperCase()}</span>}
-                {isGen3 && <span className="avatar-badge" aria-label="Gen3 contributor">G3</span>}
+                {isGen3 && <span className="avatar-badge" aria-hidden="true">G3</span>}
               </a>
             );
           })}

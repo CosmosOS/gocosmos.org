@@ -16,6 +16,19 @@ export function useReveal(): void {
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
-    return () => io.disconnect();
+    // Keyboard: tabbing into a block that hasn't scrolled into view yet must
+    // reveal it — focus must never land on an invisible element.
+    const onFocusIn = (e: FocusEvent) => {
+      const el = (e.target as Element).closest?.('[data-reveal]');
+      if (el && !el.classList.contains('is-visible')) {
+        el.classList.add('is-visible');
+        io.unobserve(el);
+      }
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => {
+      document.removeEventListener('focusin', onFocusIn);
+      io.disconnect();
+    };
   }, []);
 }

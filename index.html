@@ -8,11 +8,16 @@
   <link rel="icon" href="/favicon.ico">
   <script>
     // Runs before first paint: mark JS as available (reveal-on-scroll only
-    // hides content under html.js) and apply the stored theme to avoid a
-    // dark-theme flash for light-mode visitors.
+    // hides content under html.js), apply the stored theme — falling back to
+    // the OS color scheme on first visit — to avoid a wrong-theme flash, and
+    // restore the animation-pause toggle.
     document.documentElement.classList.add('js');
     try {
-      if (localStorage.getItem('cosmos-theme') === 'light') document.documentElement.dataset.theme = 'light';
+      var t = localStorage.getItem('cosmos-theme');
+      if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+      var m = localStorage.getItem('cosmos-motion');
+      if (m === 'off' || m === 'on') document.documentElement.dataset.motion = m;
     } catch {}
   </script>
 </head>

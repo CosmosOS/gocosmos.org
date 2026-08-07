@@ -19,10 +19,11 @@ export function App() {
   useGlassLight();
   return (
     <>
+      <a className="skip-link glass" href="#main">Skip to content</a>
       <Starfield />
       <Ufo />
       <Nav />
-      <main>
+      <main id="main">
         <Hero />
         <Features />
         <Projects />

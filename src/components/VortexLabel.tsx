@@ -73,7 +73,7 @@ export function VortexLabel({ text }: { text: string }) {
           {ICONS.arrow}
         </span>
       </span>
-      <span className="vx-sr">{text}</span>
+      <span className="sr-only">{text}</span>
     </>
   );
 }

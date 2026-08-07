@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface Spec {
   key: string;
   value: string;
@@ -44,6 +46,7 @@ const ART = [
 ].join('\n');
 
 export function Features() {
+  const [open, setOpen] = useState<string | null>(null);
   return (
     <section className="section section-tinted" id="features">
       <div className="container">
@@ -67,15 +70,24 @@ export function Features() {
               </div>
             </div>
             <ul className="readout-specs">
-              {/* onClick focus: insurance for browsers that don't focus a
-                  tapped tabindex element — :focus-within drives the reveal. */}
+              {/* Each row is a real disclosure: click/Enter/Space toggles and
+                  aria-expanded reports it. Hover and focus still preview the
+                  description (sighted-only sugar via CSS). */}
               {SPECS.map(s => (
-                <li key={s.key} className="spec-row" tabIndex={0} onClick={e => e.currentTarget.focus()}>
-                  <div className="spec-line">
-                    <span className="spec-key">{s.key}</span>
-                    <span className="spec-value">{s.value}</span>
-                  </div>
-                  <div className="spec-desc"><p>{s.desc}</p></div>
+                <li key={s.key} className="spec-row" data-open={open === s.key || undefined}>
+                  <button
+                    type="button"
+                    className="spec-btn"
+                    aria-expanded={open === s.key}
+                    aria-controls={`spec-${s.key}`}
+                    onClick={() => setOpen(o => (o === s.key ? null : s.key))}
+                  >
+                    <span className="spec-line">
+                      <span className="spec-key">{s.key}</span>
+                      <span className="spec-value">{s.value}</span>
+                    </span>
+                  </button>
+                  <div className="spec-desc" id={`spec-${s.key}`}><p>{s.desc}</p></div>
                 </li>
               ))}
             </ul>

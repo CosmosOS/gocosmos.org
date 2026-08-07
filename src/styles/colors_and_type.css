@@ -5,6 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
+  /* UA-rendered surfaces (scrollbars, ::selection, form controls) follow the
+     active theme instead of defaulting to a light scheme on the dark page. */
+  color-scheme: dark;
+
   /* ---------- Neutrals (dark-first) ---------- */
   --bg-0: #0A0A0F;          /* page background */
   --bg-1: #0B0B11;          /* code block / hero panel */
@@ -17,9 +21,9 @@
   --border-3: #3A3A4D;      /* focus ring base */
 
   --fg-1: #F5F5FA;          /* primary text */
-  --fg-2: #A0A0B5;          /* secondary text */
-  --fg-3: #6E6E85;          /* tertiary / captions */
-  --fg-4: #4A4A5C;          /* placeholder / disabled */
+  --fg-2: #A0A0B5;          /* secondary text — 7.7:1 on bg-0 */
+  --fg-3: #9C9CB2;          /* tertiary / captions — 7.35:1 on bg-0 (AAA) */
+  --fg-4: #4A4A5C;          /* disabled controls ONLY (contrast-exempt) — never placeholder/real text */
 
   /* ---------- Brand accent — pulled from logo (cream halo on dark slate) ---------- */
   --accent:       #F2EBDA;     /* cream halo — primary signal */
@@ -61,18 +65,18 @@
   --font-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* ---------- Type scale ---------- */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 32px;
-  --text-4xl: 40px;
-  --text-5xl: 56px;
-  --text-6xl: 72px;
-  --text-7xl: 88px;
+  /* ---------- Type scale (rem so browser font-size preferences apply) ---------- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.5rem;
+  --text-6xl: 4.5rem;
+  --text-7xl: 5.5rem;
 
   /* ---------- Spacing (4px base) ---------- */
   --space-1: 4px;
@@ -117,6 +121,8 @@
 
 /* ---------- Light mode ---------- */
 [data-theme='light'] {
+  color-scheme: light;
+
   --bg-0: #FFFFFF;
   --bg-1: #FAFAFC;
   --bg-2: #F5F5F8;
@@ -128,9 +134,9 @@
   --border-3: #B8B8C4;
 
   --fg-1: #0A0A0F;
-  --fg-2: #4A4A5C;
-  --fg-3: #6E6E85;
-  --fg-4: #A0A0B5;
+  --fg-2: #4A4A5C;          /* 8.7:1 on white */
+  --fg-3: #50506A;          /* 7.8:1 on white, 7.2:1 on bg-2 (AAA) */
+  --fg-4: #A0A0B5;          /* disabled controls ONLY (contrast-exempt) */
 
   --grad-hero-glow: radial-gradient(
     ellipse 80% 60% at 50% 20%,
@@ -253,9 +259,23 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; }
 
+/* Motion kill switch: the OS preference (overridable by an explicit
+   data-motion="on" from the nav toggle) and the toggle's own "off". The
+   iteration-count line stops `infinite` animations (e.g. the cast player's
+   loading spinner) from re-looping at 0.01ms. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  html:not([data-motion='on']) *,
+  html:not([data-motion='on']) *::before,
+  html:not([data-motion='on']) *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }

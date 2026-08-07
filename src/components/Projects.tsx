@@ -124,8 +124,10 @@ export function Projects() {
         <div className="section-head" data-reveal>
           <div className="cs-eyebrow">// built with cosmos</div>
           <h2 className="cs-h1">Featured projects</h2>
-          <p className="section-sub">{errored
-            ? 'Projects couldn’t load from GitHub — showing a snapshot. Live on the marketing site.'
+          {/* role="status": the silent post-load swap to the snapshot copy is
+              announced to screen readers. */}
+          <p className="section-sub" role="status">{errored
+            ? 'Projects couldn’t load from GitHub — showing a snapshot. Live data returns when GitHub is reachable again.'
             : 'Don’t know where to start? See these projects to learn Cosmos by example and for inspiration!'}</p>
         </div>
         <div className="term-block" data-reveal>
@@ -140,7 +142,10 @@ export function Projects() {
                   href={p.html_url}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={touch && openIdx !== i ? e => { e.preventDefault(); setOpenIdx(i); } : undefined}
+                  aria-expanded={touch ? openIdx === i : undefined}
+                  // e.detail === 0 is a keyboard "click": Enter always follows
+                  // the link (focus already revealed the description).
+                  onClick={touch && openIdx !== i ? e => { if (e.detail === 0) return; e.preventDefault(); setOpenIdx(i); } : undefined}
                 >
                   <span className="proj-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <span className="proj-main">
@@ -149,7 +154,7 @@ export function Projects() {
                         <span className="proj-owner">{p.owner}/</span>
                         <span className="proj-name">{p.name}</span>
                       </span>
-                      <span className="proj-stars">{ICONS.star}{p.stars}</span>
+                      <span className="proj-stars">{ICONS.star}{p.stars}<span className="sr-only"> stars</span></span>
                     </span>
                     <span className="proj-desc-wrap">
                       <span className="proj-desc">
@@ -164,8 +169,10 @@ export function Projects() {
               </li>
             ))}
           </ol>
-          <div className="proj-foot" aria-hidden="true">
-            {display.length} repos · {errored ? 'snapshot' : 'live from GitHub'} · tag yours <span className="proj-foot-topic">cosmos-os</span> to appear here
+          {/* Not aria-hidden: the count, data status and how-to-get-listed
+              instruction are real content. "live" only after a real fetch. */}
+          <div className="proj-foot">
+            {display.length} repos · {list && !errored ? 'live from GitHub' : 'snapshot'} · tag yours <span className="proj-foot-topic">cosmos-os</span> to appear here
           </div>
         </div>
       </div>

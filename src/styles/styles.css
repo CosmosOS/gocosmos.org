@@ -2,9 +2,21 @@
    Cosmos website — local layout + component styles
    ============================================================ */
 
-html { background: var(--bg-0); }
+/* scroll-padding: anchor jumps and focus-driven scrolls land below the
+   sticky nav pill (12px offset + 58px pill + 14px air) instead of under it. */
+html { background: var(--bg-0); scroll-padding-top: 84px; }
 body { background: transparent; color: var(--fg-1); overflow-x: hidden; }
 img { display: block; max-width: 100%; }
+
+/* Skip link — the page's first tab stop; visually hidden until focused,
+   then a glass pill above the nav. */
+.skip-link {
+  position: fixed; top: 12px; left: 16px; z-index: 60;
+  padding: 12px 18px; border-radius: 999px;
+  color: var(--fg-1); font-size: var(--text-sm);
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible { transform: none; }
 
 .container { max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
 .container-narrow { max-width: 880px; }
@@ -207,9 +219,9 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   93% { transform: translate(1px, -1.5px) rotate(4deg) scale(1.06, 0.9); filter: none; }
   94.5%, 100% { transform: none; filter: none; }
 }
-/* Visually hidden plain text for screen readers (the glyph spans are
-   aria-hidden). */
-.vx-sr {
+/* Visually hidden text for screen readers — the site-wide utility (used by
+   VortexLabel for its plain-text label, star counts, etc.). */
+.sr-only {
   position: absolute; width: 1px; height: 1px; margin: -1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
@@ -261,10 +273,15 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   transition: transform 500ms var(--ease-out), filter 500ms var(--ease-out);
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn-primary::before, .btn-primary::after,
-  .btn-primary > .vx-label, .vx-label .vx-l,
-  .vx-swirl, .vx-spin, .vx-strand { animation: none !important; }
+  html:not([data-motion='on']) .btn-primary::before, html:not([data-motion='on']) .btn-primary::after,
+  html:not([data-motion='on']) .btn-primary > .vx-label, html:not([data-motion='on']) .vx-label .vx-l,
+  html:not([data-motion='on']) .vx-swirl, html:not([data-motion='on']) .vx-spin,
+  html:not([data-motion='on']) .vx-strand { animation: none !important; }
 }
+[data-motion='off'] .btn-primary::before, [data-motion='off'] .btn-primary::after,
+[data-motion='off'] .btn-primary > .vx-label, [data-motion='off'] .vx-label .vx-l,
+[data-motion='off'] .vx-swirl, [data-motion='off'] .vx-spin,
+[data-motion='off'] .vx-strand { animation: none !important; }
 /* Secondary buttons are glass surfaces (class set in markup). */
 .btn-secondary { color: var(--fg-1); }
 /* All :hover rules gated on `hover: hover` — touch devices don't clear the
@@ -280,7 +297,7 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 }
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border-radius: 10px;
+  width: 44px; height: 44px; border-radius: 10px;
   background: transparent; color: var(--fg-2); border: 1px solid transparent;
   cursor: pointer;
   transition: background-color var(--dur-fast) var(--ease-inout), border-color var(--dur-fast) var(--ease-inout),
@@ -295,6 +312,10 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .theme-toggle .icon-sun, .theme-toggle .icon-moon { display: contents; }
 [data-theme='light'] .theme-toggle .icon-sun { display: none; }
 [data-theme='dark'] .theme-toggle .icon-moon { display: none; }
+/* Motion toggle: same both-icons trick keyed on data-motion. */
+.motion-toggle .icon-play, .motion-toggle .icon-pause { display: contents; }
+html:not([data-motion='off']) .motion-toggle .icon-play { display: none; }
+[data-motion='off'] .motion-toggle .icon-pause { display: none; }
 
 /* ----- Brand pill — glass chip ----- */
 .gen-pill {
@@ -318,16 +339,21 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
 .nav-inner {
   max-width: var(--container-max); margin: 0 auto;
   display: flex; align-items: center; gap: 16px;
-  height: 56px; padding: 6px 6px 6px 18px;
+  /* 58px − 12px padding − 2px border = 44px-tall buttons (touch target). */
+  height: 58px; padding: 6px 6px 6px 18px;
   border-radius: 999px;
 }
 .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .nav-brand img { height: 24px; width: auto; }
 .nav-links { display: flex; gap: 22px; margin-left: 16px; }
-.nav-links a { color: var(--fg-2); font-size: 14px; transition: color var(--dur-fast); }
+/* Padding + negative margin: 44px hit areas without changing the layout. */
+.nav-links a {
+  color: var(--fg-2); font-size: 14px; transition: color var(--dur-fast);
+  padding: 12px 6px; margin: -12px -6px;
+}
 .nav-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; height: 100%; }
 .nav-actions .btn { padding: 0 16px; height: 100%; font-size: 13px; border-radius: 999px; line-height: 1; }
-.nav-actions .icon-btn { height: 36px; width: 36px; border-radius: 999px; }
+.nav-actions .icon-btn { height: 44px; width: 44px; border-radius: 999px; }
 /* Inside the pill the button's outer drop shadow has nowhere to fall: the
    .nav-cta-inner clip cuts it 16px down, which reads as a hard seam on light
    backgrounds. Keep only the inset void shading here. */
@@ -380,7 +406,16 @@ html.js .nav-cta:not(.is-visible) {
      centering (`inline` would drop the glyphs onto the text baseline, which
      shifts when the webfont swaps in) and keep its SR text in the tree. */
   .nav-actions .btn-primary > .vx-label { display: inline-flex; }
-  .nav-actions .btn-primary > .vx-sr { display: inline; }
+  .nav-actions .btn-primary > .sr-only { display: inline; }
+}
+
+/* 320px viewports: the pill can't fit the full CTA label next to the toggles
+   — collapse the black hole to its arrow (.sr-only text keeps the name). */
+@media (max-width: 480px) {
+  .nav { padding: 0 10px; }
+  .nav-actions .btn { padding: 0 12px; }
+  .nav-actions .btn-primary > .vx-label .vx-l:not(.vx-arrow) { display: none; }
+  .nav-actions .btn-primary .vx-arrow { margin-left: 0; }
 }
 
 /* ============================================================
@@ -422,12 +457,14 @@ html.js .nav-cta:not(.is-visible) {
   display: inline-flex; align-items: center; gap: 12px;
   padding: 6px 6px 6px 6px; margin-bottom: 28px;
   border-radius: 999px;
-  font-family: var(--font-mono); font-size: 12px; color: var(--fg-2);
+  /* fg-1: the 12px mono text needs 7:1 over the glass gradient's brightest stop. */
+  font-family: var(--font-mono); font-size: 12px; color: var(--fg-1);
   padding-right: 16px;
 }
 .hero-title {
   font-family: var(--font-sans); font-weight: 600;
-  font-size: clamp(40px, 7.4vw, 80px);
+  /* rem terms so the headline follows text-only zoom / user font-size prefs. */
+  font-size: clamp(2.5rem, 1.5rem + 4.5vw, 5rem);
   line-height: 1.04; letter-spacing: -0.035em;
   margin: 0 0 24px; color: var(--fg-1);
 }
@@ -457,10 +494,17 @@ html.js .nav-cta:not(.is-visible) {
 /* Asciinema player, restyled to sit bare on the page. */
 .term-player .ap-wrapper { background: transparent; }
 .term-player .ap-player { border-radius: 0; }
-/* Playback starts via IntersectionObserver — hide the big start overlay.
-   Doubled class beats the player's own `.ap-player .ap-overlay { display: flex }`,
-   which has equal specificity and loads after this file in the bundle. */
-.term-player .ap-overlay.ap-overlay-start { display: none; }
+/* Playback starts via IntersectionObserver — hide the big start overlay,
+   EXCEPT when motion is off (no autostart there, so the overlay is the
+   affordance for starting playback manually). Doubled class beats the
+   player's own `.ap-player .ap-overlay { display: flex }`. */
+html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='on']) .term-player .ap-overlay.ap-overlay-start { display: flex; }
+}
+/* controls:'auto' reveals the bar on mouse motion only — mirror it for
+   keyboard focus so tabbed-in users can see the buttons they land on. */
+.term-player .ap-wrapper:focus-within .ap-control-bar { opacity: 1; }
 /* The screen itself toggles playback on click (see Hero.tsx). */
 .term-player .ap-terminal { cursor: pointer; }
 /* Doubled class: the player's own CSS lands later in the bundle and resets
@@ -477,7 +521,7 @@ html.js .nav-cta:not(.is-visible) {
   --term-color-5: #C792EA;
   --term-color-6: #4DD0E1;
   --term-color-7: #C8C8D8;
-  --term-color-8: #6E6E85;
+  --term-color-8: #9C9CB2;
   --term-color-9: #FF8A8A;
   --term-color-10: #6EE7A0;
   --term-color-11: #FFC97A;
@@ -487,12 +531,14 @@ html.js .nav-cta:not(.is-visible) {
   --term-color-15: #F5F5FA;
 }
 /* Colored spans are snapshotted into inline `style.color` at creation, so
-   they keep the recorded palette in both themes. Only default-colored text
-   follows the live CSS var — and with no screen surface behind the glyphs
-   anymore, near-white plain text would vanish on the light background, so
-   re-ink just the foreground there. */
-[data-theme='light'] .asciinema-player-theme-cosmos.asciinema-player-theme-cosmos {
-  --term-color-foreground: #1C1C20;
+   they keep the recorded palette in both themes — a palette tuned for a dark
+   screen. In light mode, give the cast its own dark slab (box-shadow spread
+   fakes 12px padding without changing the measured width) so every recorded
+   color keeps its original contrast; the page stays monochrome. */
+[data-theme='light'] .term-scroll {
+  background: #0B0B11;
+  box-shadow: 0 0 0 12px #0B0B11;
+  border-radius: 4px;
 }
 /* The transparent --term-color-background above also feeds the player's
    overlays: tooltips, the PAUSED flash, and the kbd keycaps (help panel and
@@ -536,7 +582,8 @@ html.js .nav-cta:not(.is-visible) {
 .section-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
 .section-head .cs-eyebrow { margin-bottom: 14px; display: block; }
 .section-head h2 { margin: 0 0 14px; }
-.section-sub { font-size: 16px; line-height: 1.6; color: var(--fg-2); margin: 0; }
+/* 66ch cap keeps intro paragraphs under the 80-char AAA measure. */
+.section-sub { font-size: 16px; line-height: 1.6; color: var(--fg-2); margin: 0 auto; max-width: 66ch; }
 
 @media (max-width: 768px) {
   .section { padding: 64px 0; }
@@ -573,13 +620,18 @@ html.js .nav-cta:not(.is-visible) {
    em with px floors so it stays readable where the cast shrinks below. */
 .term-block {
   font-family: var(--font-mono); padding: 12px 10px; text-align: left;
-  font-size: clamp(12.5px, calc((100vw - 64px) / 60), 18.9px);
+  /* Same curve, rem bounds: follows browser font-size preferences while
+     keeping the cast-size pairing at default settings. */
+  font-size: clamp(0.78rem, calc((100vw - 4rem) / 60), 1.18rem);
 }
 .term-cmd { font-size: 1em; color: var(--fg-1); margin: 0 0 18px; }
 /* Prompt inks match the hero cast exactly (bold SGR 32/34 over the cosmos
-   palette) and, like the cast's colored spans, don't change with the theme. */
+   palette) in dark mode. On the light page those inks fail contrast
+   (1.8:1 / 2.5:1 on white), so light mode re-inks them slate like every
+   other light override (.hero-accent, .spec-key, .proj-name). */
 .term-user { color: #3DDC84; font-weight: 700; }
 .term-path { color: #6CA4F8; font-weight: 700; }
+[data-theme='light'] .term-user, [data-theme='light'] .term-path { color: var(--fg-1); }
 
 .readout {
   display: grid; grid-template-columns: auto 1fr; gap: 12px 72px;
@@ -590,12 +642,12 @@ html.js .nav-cta:not(.is-visible) {
   .readout-tags { justify-content: center; }
 }
 
-.readout-side { color: var(--fg-3); font-size: 12px; line-height: 1.7; align-self: start; }
+.readout-side { color: var(--fg-3); font-size: 0.75rem; line-height: 1.7; align-self: start; }
 .readout-art {
   margin: 0 0 16px; font-family: inherit;
   /* Tracks the block's cast-size formula at ~0.78× so the planet fills the
      left column without squeezing the specs at narrower widths. */
-  font-size: clamp(9.5px, calc((100vw - 64px) / 77), 14.8px);
+  font-size: clamp(0.59rem, calc((100vw - 4rem) / 77), 0.925rem);
   line-height: 1.3;
   color: var(--halo, #F2EBDA); opacity: 0.92;
   /* The mobile layout centers .readout-side; if that inherits into the pre
@@ -603,7 +655,7 @@ html.js .nav-cta:not(.is-visible) {
   text-align: left;
 }
 @media (max-width: 720px) {
-  .readout-art { display: table; margin: 0 auto 16px; font-size: 9.5px; }
+  .readout-art { display: table; margin: 0 auto 16px; font-size: 0.59rem; }
 }
 [data-theme='light'] .readout-art { color: var(--fg-1); opacity: 0.85; }
 /* Caption under the art: centered on the art's width, with clear air
@@ -612,15 +664,23 @@ html.js .nav-cta:not(.is-visible) {
 
 /* One notch under the cast size — full 1em on sentence-length values reads
    much heavier than the projects listing's short slugs, so the specs sit
-   between the command line (1em) and the hover descriptions. */
-.readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; font-size: 0.85em; }
+   between the command line (1em) and the hover descriptions. The rem floor
+   keeps them readable where the vw formula bottoms out. */
+.readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; font-size: max(0.72rem, 0.85em); }
 .spec-row {
   padding: 7px 12px; margin: 0 -12px; border-radius: 8px;
-  outline: none; cursor: default;
   transition: background var(--dur-fast);
 }
-.spec-row:hover, .spec-row:focus-within { background: rgba(255, 255, 255, 0.05); }
-[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-within { background: rgba(20, 20, 35, 0.06); }
+/* Each row is a real disclosure <button> (aria-expanded in Features.tsx);
+   unstyled so the row family keeps one look. */
+.spec-btn {
+  display: block; width: 100%; margin: 0; padding: 0;
+  background: none; border: 0; color: inherit; font: inherit;
+  text-align: left; cursor: pointer;
+}
+.spec-row:hover, .spec-row:focus-within, .spec-row[data-open] { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-within,
+[data-theme='light'] .spec-row[data-open] { background: rgba(20, 20, 35, 0.06); }
 .spec-line { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
 .spec-key { color: var(--halo, #F2EBDA); min-width: 6ch; flex-shrink: 0; }
 [data-theme='light'] .spec-key { color: var(--fg-1); font-weight: 600; }
@@ -633,16 +693,17 @@ html.js .nav-cta:not(.is-visible) {
   padding-left: calc(6ch + 18px);
   transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
 }
-.spec-row:hover .spec-desc, .spec-row:focus-within .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
+.spec-row:hover .spec-desc, .spec-row:focus-within .spec-desc,
+.spec-row[data-open] .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
 .spec-desc p {
   overflow: hidden; min-height: 0; margin: 0; padding: 0;
   color: var(--fg-2); font-size: max(11px, 0.88em); line-height: 1.6;
   max-width: 76ch;
 }
-/* On touch there is no hover — rows start collapsed and a tap expands:
-   the li carries tabindex, tapping focuses it and :focus-within above does
-   the rest (tapping another row moves focus and collapses this one). */
+/* On touch there is no hover — rows start collapsed and a tap toggles the
+   disclosure button ([data-open] above); bigger padding = 44px tap targets. */
 @media (max-width: 560px) { .spec-desc { padding-left: 0; } }
+@media (hover: none) { .spec-row { padding: 14px 12px; } }
 
 /* ============================================================
    Timeline
@@ -685,7 +746,9 @@ html.js .nav-cta:not(.is-visible) {
   display: grid; grid-template-columns: repeat(14, 1fr); gap: 12px;
 }
 @media (max-width: 1024px) { .avatar-wall { grid-template-columns: repeat(10, 1fr); } }
-@media (max-width: 720px) { .avatar-wall { grid-template-columns: repeat(6, 1fr); } }
+/* auto-fill 44px floor: narrow phones drop a column instead of shrinking
+   the tap targets below 44px. */
+@media (max-width: 720px) { .avatar-wall { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); } }
 .avatar {
   position: relative;
   display: block; aspect-ratio: 1; border-radius: 50%;
@@ -743,7 +806,8 @@ html.js .nav-cta:not(.is-visible) {
    from the wrap's margin-top when it opens. */
 .proj-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .proj-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.proj-slug { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1em; }
+/* Wrap instead of ellipsize: the slug is the link's identifying text. */
+.proj-slug { min-width: 0; overflow-wrap: anywhere; font-size: 1em; }
 .proj-owner { color: var(--fg-3); font-size: max(11px, 0.85em); }
 .proj-name { color: var(--halo, #F2EBDA); font-weight: 600; }
 [data-theme='light'] .proj-name { color: var(--fg-1); }
@@ -774,6 +838,8 @@ html.js .nav-cta:not(.is-visible) {
 .proj-topics { color: var(--fg-3); font-size: 0.92em; }
 
 .proj-foot { margin-top: 16px; font-size: max(11px, 0.75em); color: var(--fg-3); }
+/* Touch: taller rows so the two-step tap accordion clears 44px. */
+@media (hover: none) { .proj-row { padding: 12px; } }
 .proj-foot-topic { color: var(--fg-1); }
 
 /* ============================================================
@@ -829,7 +895,8 @@ html.js .nav-cta:not(.is-visible) {
   color: var(--fg-3); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
 }
 .footer-cols a {
-  display: block; padding: 5px 0; font-size: 14px; color: var(--fg-2);
+  /* 11px padding: 44px-tall targets in the stacked list. */
+  display: block; padding: 11px 0; font-size: 14px; color: var(--fg-2);
   transition: color var(--dur-fast);
 }
 @media (hover: hover) {
@@ -858,3 +925,16 @@ html.js .nav-cta:not(.is-visible) {
 }
 .nav-links a:active,
 .footer-cols a:active { opacity: 0.6; }
+
+/* ============================================================
+   Focus — one visible ring for every interactive element, both themes.
+   Cream in dark mode, slate in light (stays monochrome). Last in the
+   file so nothing (e.g. component rules) silently overrides it.
+   ============================================================ */
+:focus-visible { outline: 2px solid var(--halo, #F2EBDA); outline-offset: 2px; }
+[data-theme='light'] :focus-visible { outline-color: var(--fg-1); }
+
+/* Fallback for engines that ignore scroll-padding on focus scrolling. */
+#top, #features, #projects, #timeline, #contributors, #community, #main {
+  scroll-margin-top: 84px;
+}

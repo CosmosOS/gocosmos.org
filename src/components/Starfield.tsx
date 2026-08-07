@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useMotionOff } from '../hooks/useMotion';
 
 type RGB = readonly [number, number, number];
 
@@ -74,10 +75,11 @@ function rgba(c: RGB, a: number): string {
  */
 export function Starfield() {
   const ref = useRef<HTMLCanvasElement>(null);
+  // Reactive: OS setting or the nav pause toggle restarts/stops the effect.
+  const reduced = useMotionOff();
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let raf = 0;
@@ -367,6 +369,6 @@ export function Starfield() {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouse);
     };
-  }, []);
+  }, [reduced]);
   return <canvas ref={ref} className="starfield" aria-hidden="true" />;
 }

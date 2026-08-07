@@ -29,7 +29,7 @@ export function Footer() {
       </div>
       <div className="container footer-fine">
         <span>MIT licensed · © 2024 Kaleb McGhie (zarlo) and Cosmos contributors</span>
-        <span className="footer-fine-right">v3.0.54 · Gen3</span>
+        <span className="footer-fine-right">Gen3</span>
       </div>
     </footer>
   );

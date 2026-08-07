@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useMotionOff } from './useMotion';
 
 /**
  * Hover feedback on .glass controls: ONLY the surface under the pointer
@@ -21,8 +22,10 @@ import { useEffect } from 'react';
  * prefers-reduced-motion and on touch-only pointers.
  */
 export function useGlassLight(): void {
+  // Reactive: OS setting or the nav pause toggle restarts/stops the effect.
+  const off = useMotionOff();
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (off) return;
     // Touch devices fire pointermove during a tap and never send another
     // event when the finger lifts — the glint would stick to the last tap.
     if (!window.matchMedia('(hover: hover)').matches) return;
@@ -135,6 +138,12 @@ export function useGlassLight(): void {
       window.removeEventListener('scroll', invalidate);
       window.removeEventListener('resize', invalidate);
       if (raf) cancelAnimationFrame(raf);
+      // Park stylesheet defaults on anything caught mid-fade.
+      states.forEach((_, el) => {
+        el.style.setProperty('--glare-o', '0');
+        el.style.setProperty('--sh-x', '0px');
+        el.style.setProperty('--sh-y', '8px');
+      });
     };
-  }, []);
+  }, [off]);
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useMotionOff } from '../hooks/useMotion';
 
 /** Sprite strip: 29 frames of the saucer's hover shimmer, re-centered from the
  *  original gif so position is fully script-controlled (scripts in the repo
@@ -19,11 +20,19 @@ type Mode = 'wander' | 'chase';
  */
 export function Ufo() {
   const ref = useRef<HTMLDivElement>(null);
+  // Reactive: OS setting or the nav pause toggle restarts/stops the effect
+  // (the cleanup below already resets the glass tugs).
+  const off = useMotionOff();
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (off) {
+      // Park it off-screen so a mid-flight pause doesn't freeze the saucer
+      // over the page.
+      el.style.transform = 'translate3d(-200px, 160px, 0)';
+      return;
+    }
 
     let raf = 0;
     let last = performance.now();
@@ -78,6 +87,10 @@ export function Ufo() {
     const MIN_SCALE = 0.4;
     const tugs = new WeakMap<HTMLElement, { x: number; y: number; o: number }>();
     let els: HTMLElement[] = [];
+    // Interactive glass (links/buttons or panes containing them) gets the
+    // underglow but never the physical tug — a moving target is a 2.2.2
+    // problem for pointer users trying to click it.
+    let interactive: boolean[] = [];
     let base: { cx: number; cy: number; left: number; top: number; w: number; h: number }[] = [];
     let shyRects: { left: number; top: number; right: number; bottom: number }[] = [];
     let cacheAt = -1e9;
@@ -87,6 +100,7 @@ export function Ufo() {
 
     const refreshCache = (t: number) => {
       els = Array.from(document.querySelectorAll<HTMLElement>('.glass'));
+      interactive = els.map(g => g.matches('a, button') || !!g.querySelector('a, button'));
       base = els.map(g => {
         const r = g.getBoundingClientRect();
         // Subtract the element's own tug so cached centers are its rest position.
@@ -125,10 +139,12 @@ export function Ufo() {
         tug.y += ((dist > 1 ? ((scy - b.cy) / dist) * pull : 0) - tug.y) * blend;
         tug.o = strength;
         tugs.set(g, tug);
-        if (Math.abs(tug.x) > 0.05 || Math.abs(tug.y) > 0.05) {
-          g.style.translate = `${tug.x.toFixed(2)}px ${tug.y.toFixed(2)}px`;
-        } else if (g.style.translate) {
-          g.style.translate = '';
+        if (!interactive[i]) {
+          if (Math.abs(tug.x) > 0.05 || Math.abs(tug.y) > 0.05) {
+            g.style.translate = `${tug.x.toFixed(2)}px ${tug.y.toFixed(2)}px`;
+          } else if (g.style.translate) {
+            g.style.translate = '';
+          }
         }
         g.style.setProperty('--ufo-x', `${(((scx - b.left) / b.w) * 100).toFixed(1)}%`);
         g.style.setProperty('--ufo-y', `${(((scy - b.top) / b.h) * 100).toFixed(1)}%`);
@@ -237,7 +253,7 @@ export function Ufo() {
         g.style.removeProperty('--ufo-o');
       });
     };
-  }, []);
+  }, [off]);
 
   // Initial transform parks it off-screen: identical on server and client, so
   // hydration matches and non-JS visitors never see it stuck in a corner.

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 import { ICONS } from '../icons';
+import { motionOff, subscribeMotion } from '../hooks/useMotion';
 
 /** Shown until the GitHub API answers (and if it never does). */
 const FALLBACK_VERSION = 'v3.0.79';
@@ -66,7 +67,9 @@ export function Hero() {
         cols: 100,
         rows: 20,
         preload: true,
-        loop: true,
+        // With motion off the cast never autostarts (the start overlay stays
+        // visible instead — see styles.css) and a manual play runs once.
+        loop: !motionOff(),
         controls: 'auto',
         theme: 'cosmos',
         terminalFontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
@@ -121,6 +124,9 @@ export function Hero() {
         entries => {
           for (const entry of entries) {
             if (!started) {
+              // No autostart under reduced motion / the pause toggle; the
+              // visitor starts playback themselves (overlay or click).
+              if (motionOff()) continue;
               const height = entry.boundingClientRect.height || 1;
               const viewport = entry.rootBounds?.height ?? window.innerHeight;
               // Compare vertical visibility only: on phones the player sits
@@ -149,8 +155,16 @@ export function Hero() {
       observer.observe(node);
     });
 
+    // Flipping the nav toggle to "off" mid-playback pauses like a user pause
+    // (wantPlaying stays true, so the pause listener attributes it to the
+    // user and the viewport observer won't auto-resume it).
+    const unsubMotion = subscribeMotion(() => {
+      if (motionOff() && isPlaying) quiet(player?.pause());
+    });
+
     return () => {
       cancelled = true;
+      unsubMotion();
       document.removeEventListener('visibilitychange', onVisibility);
       if (onTermClick) node.removeEventListener('click', onTermClick);
       if (onTermKeyDown) node.removeEventListener('keydown', onTermKeyDown, true);
@@ -187,12 +201,16 @@ export function Hero() {
       </div>
 
       <div className="container">
-        <div className="term-scroll">
-          <div
-            className="term-player"
-            ref={playerRef}
-            aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
-          />
+        {/* The label lives on the scroller (a real region — labels are
+            ignored on the unroled player div), which is also focusable so
+            arrow keys can scroll it where it clips (≤720px / high zoom). */}
+        <div
+          className="term-scroll"
+          role="region"
+          tabIndex={0}
+          aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
+        >
+          <div className="term-player" ref={playerRef} />
         </div>
       </div>
     </section>
