@@ -1,4 +1,4 @@
-# gocosmos.org — Cosmos marketing site
+# gocosmos.org
 
 React 18 + TypeScript + Vite. The Docker container (php:8.2-apache) serves the
 static build output from `html/`.
