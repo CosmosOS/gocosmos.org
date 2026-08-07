@@ -38,9 +38,11 @@ jobs:
           # The same credentials work over SSH on port 22, where the docroot
           # is web/gocosmos.org/public_html. sync mirrors the source dir and
           # prunes everything else, so the built site never leaks to prod.
-          mkdir live
+          mkdir -p live/assets
           cp site/html/under-construction.html live/index.html
           cp site/html/favicon.ico live/
+          # The holding page's saucer sprite (from public/assets)
+          cp site/html/assets/ufo-sprite.webp live/assets/
           export RCLONE_CONFIG_DEPLOY_TYPE=sftp
           export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
           export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
