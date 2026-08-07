@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Holding page only — keep it out of search indexes until launch. -->
+  <meta name="robots" content="noindex">
+  <title>Cosmos — Site under construction</title>
+  <meta name="description" content="The new Cosmos website is under construction.">
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    /* Standalone page: tokens copied from src/styles/colors_and_type.css so it
+       ships without the app bundle. Light mode stays monochrome (accent = fg). */
+    :root {
+      --bg-0: #0A0A0F;
+      --bg-1: #0B0B11;
+      --fg-1: #F5F5FA;
+      --fg-2: #A0A0B5;
+      --accent: #F2EBDA;
+      --line: rgba(242, 235, 218, 0.28);
+      --font-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-0: #FFFFFF;
+        --bg-1: #FAFAFC;
+        --fg-1: #0A0A0F;
+        --fg-2: #4A4A5C;
+        --accent: #0A0A0F;
+        --line: #E0E0E8;
+      }
+    }
+    * { margin: 0; box-sizing: border-box; }
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: var(--bg-0);
+      color: var(--fg-1);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    main { width: 100%; max-width: 38rem; }
+    .term {
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: clamp(1.25rem, 5vw, 2rem);
+    }
+    .term-cmd {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--fg-2);
+      overflow-wrap: break-word;
+    }
+    .term-user { color: var(--accent); }
+    .term-out {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--fg-2);
+      margin-top: 0.35rem;
+    }
+    .cursor {
+      display: inline-block;
+      width: 0.55em;
+      height: 1em;
+      background: var(--accent);
+      vertical-align: text-bottom;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .cursor { animation: blink 1.1s steps(1) infinite; }
+      @keyframes blink { 50% { opacity: 0; } }
+    }
+    h1 {
+      margin: 1.5rem 0 0.5rem;
+      font-size: clamp(1.5rem, 6vw, 2.1rem);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    p { color: var(--fg-2); font-size: 0.95rem; }
+    .meanwhile {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    a {
+      color: var(--fg-1);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      overflow-wrap: break-word;
+    }
+    a:hover { color: var(--accent); }
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="term">
+      <div class="term-cmd" aria-hidden="true">
+        <span class="term-user">cosmos@gen3</span>:<span>~</span>$ ./launch gocosmos.org
+      </div>
+      <div class="term-out" aria-hidden="true">[▓▓▓▓░░░░░░] building… <span class="cursor"></span></div>
+      <h1>Site under construction</h1>
+      <p>The new Cosmos website is being built and isn’t public yet. Check back soon.</p>
+      <p class="meanwhile">In the meantime, Cosmos is on GitHub:<br>
+        <a href="https://github.com/CosmosOS/Cosmos">github.com/CosmosOS/Cosmos</a>
+      </p>
+    </div>
+  </main>
+</body>
+</html>

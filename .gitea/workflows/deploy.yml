@@ -20,7 +20,10 @@ jobs:
           npm ci
           npm run build
 
-      - name: Push html/ to gocosmos.org over SFTP
+      # UNDER CONSTRUCTION: production only gets the holding page (the full
+      # site still builds above as a compile check, and local docker compose
+      # still serves it). To launch, sync site/html instead of live/.
+      - name: Push holding page to gocosmos.org over SFTP
         env:
           SFTP_HOST: 000.web.punksky.com
           SFTP_USER: ${{ secrets.FTP_USER }}
@@ -33,10 +36,13 @@ jobs:
           # jail (500 OOPS: cannot change directory:/srv/jail/<user>) and
           # drops TLS right after PASS, which killed both lftp and rclone.
           # The same credentials work over SSH on port 22, where the docroot
-          # is web/gocosmos.org/public_html. sync mirrors html/ and prunes
-          # stale hashed assets so the 256 MB quota never fills.
+          # is web/gocosmos.org/public_html. sync mirrors the source dir and
+          # prunes everything else, so the built site never leaks to prod.
+          mkdir live
+          cp site/html/under-construction.html live/index.html
+          cp site/html/favicon.ico live/
           export RCLONE_CONFIG_DEPLOY_TYPE=sftp
           export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
           export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
           export RCLONE_CONFIG_DEPLOY_PASS="$(rclone obscure "$SFTP_PASSWORD")"
-          rclone sync site/html "deploy:$SFTP_DOCROOT" -v --transfers 2
+          rclone sync live "deploy:$SFTP_DOCROOT" -v --transfers 2
