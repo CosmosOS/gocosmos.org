@@ -33,12 +33,7 @@ const SEARCHES: { q: string; gen: Gen }[] = [
   { q: 'cosmos-gen3 in:topics', gen: 'gen3' },
 ];
 
-const PINNED: { slug: string; gen: Gen }[] = [
-  { slug: 'CosmosOS/Cosmos', gen: 'gen3' },
-];
-
 const FALLBACK: Project[] = ([
-  { owner: 'CosmosOS', name: 'Cosmos', description: 'The Cosmos kernel framework. Gen3 development happens on the gen3 branch.', stars: 3100, topics: ['dotnet', 'nativeaot', 'kernel'], gens: new Set<Gen>(['gen3']) },
   { owner: 'Project-Prism', name: 'Prism-OS', description: 'An operating system written in C#, Made possible by the cosmos community!', stars: 89, topics: ['csharp', 'operating-system', 'os'], gens: new Set<Gen>(['gen2']) },
   { owner: 'LumaTechnologies', name: 'SphereOS', description: 'SphereOS - An operating system written in C#, powered by Cosmos.', stars: 74, topics: ['operating-system'], gens: new Set<Gen>(['gen2']) },
   { owner: 'Ncleardev', name: 'NclearOS-2', description: 'Cosmos based Operating System with GUI.', stars: 41, topics: ['operating-system', 'os'], gens: new Set<Gen>(['gen2']) },
@@ -70,6 +65,8 @@ function mergeProjects(results: { list: ApiRepo[]; gen: Gen }[]): Project[] {
       const project = toProject(repo, gen);
       if (!project) continue;
       const slug = `${project.owner}/${project.name}`.toLowerCase();
+      // This is the official site — the Cosmos repo itself is not a community project.
+      if (slug === 'cosmosos/cosmos') continue;
       const existing = bySlug.get(slug);
       if (existing) existing.gens.add(gen);
       else bySlug.set(slug, project);
@@ -94,20 +91,14 @@ export function Projects() {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      ...SEARCHES.map(({ q, gen }) =>
+    Promise.all(
+      SEARCHES.map(({ q, gen }) =>
         fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=${MAX_PROJECTS}`)
           .then(r => (r.ok ? r.json() : { items: [] }) as Promise<{ items?: ApiRepo[] }>)
           .catch(() => ({ items: [] as ApiRepo[] }))
           .then(x => ({ list: x.items ?? [], gen }))
-      ),
-      ...PINNED.map(({ slug, gen }) =>
-        fetch(`https://api.github.com/repos/${slug}`)
-          .then(r => (r.ok ? r.json() : null) as Promise<ApiRepo | null>)
-          .catch(() => null)
-          .then(repo => ({ list: repo ? [repo] : [], gen }))
-      ),
-    ]).then(results => {
+      )
+    ).then(results => {
       if (cancelled) return;
       const merged = mergeProjects(results);
       if (merged.length === 0) { setErrored(true); setList([]); }
