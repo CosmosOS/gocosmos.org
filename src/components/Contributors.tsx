@@ -91,7 +91,7 @@ export function Contributors() {
           <h2 className="cs-h1">Built by the community.</h2>
           <p className="section-sub" role="status">{errored
             ? 'Avatars couldn’t load — showing a snapshot. Live data returns when GitHub is reachable again.'
-            : 'Pulled live from the Cosmos (Gen2) and nativeaot-patcher (Gen3) repos.'}</p>
+            : 'Pulled live from the Cosmos Gen2 and Gen3 histories.'}</p>
         </div>
         <div className="avatar-wall" data-reveal>
           {display.map((c, i) => {

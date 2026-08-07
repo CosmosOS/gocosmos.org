@@ -8,10 +8,10 @@ interface CommunityLink {
 }
 
 const LINKS: CommunityLink[] = [
-  { icon: 'github', title: 'GitHub repo', desc: 'Source, releases, and discussion.', href: 'https://github.com/valentinbreiz/nativeaot-patcher' },
-  { icon: 'bug', title: 'Issues', desc: 'Bug reports and feature requests.', href: 'https://github.com/valentinbreiz/nativeaot-patcher/issues' },
+  { icon: 'github', title: 'GitHub repo', desc: 'Source, releases, and discussion.', href: 'https://github.com/CosmosOS/Cosmos/tree/gen3' },
+  { icon: 'bug', title: 'Issues', desc: 'Bug reports and feature requests.', href: 'https://github.com/CosmosOS/Cosmos/issues' },
   { icon: 'list', title: 'Priority board', desc: 'What we’re working on, in what order.', href: 'https://github.com/users/valentinbreiz/projects/2/views/2' },
-  { icon: 'book', title: 'Documentation', desc: 'Install, build, plugs, GC, testing.', href: 'https://valentinbreiz.github.io/nativeaot-patcher/index.html' },
+  { icon: 'book', title: 'Documentation', desc: 'Install, build, plugs, GC, testing.', href: 'https://cosmosos.github.io/' },
   { icon: 'msg', title: 'Discord', desc: 'Chat with the team and other kernel devs.', href: 'https://discord.com/invite/kwtBwv6jhD' },
 ];
 

@@ -15,13 +15,13 @@ export function Footer() {
           </div>
           <div>
             <h4>Community</h4>
-            <a href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="https://github.com/valentinbreiz/nativeaot-patcher/issues" target="_blank" rel="noreferrer">Issues</a>
+            <a href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://github.com/CosmosOS/Cosmos/issues" target="_blank" rel="noreferrer">Issues</a>
             <a href="https://github.com/users/valentinbreiz/projects/2/views/2" target="_blank" rel="noreferrer">Priority board</a>
           </div>
           <div>
             <h4>Resources</h4>
-            <a href="https://valentinbreiz.github.io/nativeaot-patcher/index.html" target="_blank" rel="noreferrer">Documentation</a>
+            <a href="https://cosmosos.github.io/" target="_blank" rel="noreferrer">Documentation</a>
             <a href="https://valentin.bzh/posts/3" target="_blank" rel="noreferrer">Gen3 article</a>
             <a href="https://github.com/CosmosOS/Cosmos" target="_blank" rel="noreferrer">Cosmos Gen2</a>
           </div>

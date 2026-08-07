@@ -13,10 +13,13 @@ export function Hero() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('https://api.github.com/repos/valentinbreiz/nativeaot-patcher/releases/latest')
-      .then(r => (r.ok ? r.json() : null) as Promise<{ tag_name?: string } | null>)
-      .then(release => {
-        if (!cancelled && release?.tag_name) setVersion(release.tag_name);
+    // The repo also hosts Gen2 releases (UserKit_*) and a rolling tools-latest
+    // tag, so scan the list for the newest vX.Y.Z tag instead of /latest.
+    fetch('https://api.github.com/repos/CosmosOS/Cosmos/releases?per_page=30')
+      .then(r => (r.ok ? r.json() : null) as Promise<{ tag_name?: string }[] | null>)
+      .then(releases => {
+        const tag = releases?.find(rel => /^v\d/.test(rel.tag_name ?? ''))?.tag_name;
+        if (!cancelled && tag) setVersion(tag);
       })
       .catch(() => {});
     return () => { cancelled = true; };
@@ -194,7 +197,7 @@ export function Hero() {
           <a className="btn btn-secondary btn-lg glass" href="https://discord.com/invite/kwtBwv6jhD" target="_blank" rel="noreferrer">
             {ICONS.msg}<span>Join community</span>
           </a>
-          <a className="btn btn-secondary btn-lg glass" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer">
+          <a className="btn btn-secondary btn-lg glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer">
             {ICONS.github}<span>Star on GitHub</span>
           </a>
         </div>

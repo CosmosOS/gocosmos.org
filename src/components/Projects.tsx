@@ -34,11 +34,11 @@ const SEARCHES: { q: string; gen: Gen }[] = [
 ];
 
 const PINNED: { slug: string; gen: Gen }[] = [
-  { slug: 'valentinbreiz/nativeaot-patcher', gen: 'gen3' },
+  { slug: 'CosmosOS/Cosmos', gen: 'gen3' },
 ];
 
 const FALLBACK: Project[] = ([
-  { owner: 'valentinbreiz', name: 'nativeaot-patcher', description: 'POC of CosmosOS gen3', stars: 120, topics: ['dotnet', 'nativeaot', 'kernel'], gens: new Set<Gen>(['gen3']) },
+  { owner: 'CosmosOS', name: 'Cosmos', description: 'The Cosmos kernel framework. Gen3 development happens on the gen3 branch.', stars: 3100, topics: ['dotnet', 'nativeaot', 'kernel'], gens: new Set<Gen>(['gen3']) },
   { owner: 'Project-Prism', name: 'Prism-OS', description: 'An operating system written in C#, Made possible by the cosmos community!', stars: 89, topics: ['csharp', 'operating-system', 'os'], gens: new Set<Gen>(['gen2']) },
   { owner: 'LumaTechnologies', name: 'SphereOS', description: 'SphereOS - An operating system written in C#, powered by Cosmos.', stars: 74, topics: ['operating-system'], gens: new Set<Gen>(['gen2']) },
   { owner: 'Ncleardev', name: 'NclearOS-2', description: 'Cosmos based Operating System with GUI.', stars: 41, topics: ['operating-system', 'os'], gens: new Set<Gen>(['gen2']) },

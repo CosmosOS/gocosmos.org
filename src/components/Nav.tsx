@@ -66,14 +66,14 @@ export function Nav() {
             <span className="icon-moon">{ICONS.moon}</span>
           </button>
           {/* aria-label keeps the name when ≤880px CSS hides the text span. */}
-          <a className="btn btn-secondary glass" href="https://github.com/valentinbreiz/nativeaot-patcher" target="_blank" rel="noreferrer" aria-label="GitHub">
+          <a className="btn btn-secondary glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer" aria-label="GitHub">
             {ICONS.github}<span>GitHub</span>
           </a>
           <div className={`nav-cta${ctaShown ? ' is-visible' : ''}`}>
             <div className="nav-cta-inner">
               <a
                 className="btn btn-primary"
-                href="https://valentinbreiz.github.io/nativeaot-patcher/index.html"
+                href="https://cosmosos.github.io/"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Get started — Cosmos documentation"
