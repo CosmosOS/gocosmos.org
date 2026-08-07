@@ -8,16 +8,6 @@ html { background: var(--bg-0); scroll-padding-top: 84px; }
 body { background: transparent; color: var(--fg-1); overflow-x: hidden; }
 img { display: block; max-width: 100%; }
 
-/* Skip link — the page's first tab stop; visually hidden until focused,
-   then a glass pill above the nav. */
-.skip-link {
-  position: fixed; top: 12px; left: 16px; z-index: 60;
-  padding: 12px 18px; border-radius: 999px;
-  color: var(--fg-1); font-size: var(--text-sm);
-  transform: translateY(-200%);
-}
-.skip-link:focus-visible { transform: none; }
-
 .container { max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
 .container-narrow { max-width: 880px; }
 
@@ -101,6 +91,19 @@ html.js [data-reveal]:not(.is-visible) { opacity: 0; transform: translateY(16px)
   .glass.glass { background: rgba(22, 22, 30, 0.92); }
   [data-theme='light'] .glass.glass { background: rgba(255, 255, 255, 0.94); }
 }
+
+/* ----- Skip link ----- */
+/* The page's first tab stop; off-screen until keyboard-focused, then a glass
+   pill above the nav. Doubled class + placed after the glass system: it must
+   out-rank .glass.glass's `position: relative` or it lands in flow, visible
+   at the top of the page. */
+.skip-link.skip-link {
+  position: fixed; top: 12px; left: 16px; z-index: 60;
+  padding: 12px 18px; border-radius: 999px;
+  color: var(--fg-1); font-size: var(--text-sm);
+  transform: translateY(-200%);
+}
+.skip-link.skip-link:focus-visible { transform: none; }
 
 /* ----- Buttons (page-level overrides on top of tokens) ----- */
 .btn {
