@@ -742,8 +742,10 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .era-tag-current { color: var(--halo, #F2EBDA); border-radius: 999px; }
 [data-theme='light'] .era-tag-current { color: var(--fg-1); }
 .era-year { font-family: var(--font-mono); font-size: 12px; color: var(--fg-3); }
-.era-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 10px; color: var(--fg-1); }
-.era-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); margin: 0; }
+/* On the design-system scale: era name = cs-h3 step, description = --text-sm,
+   the same ~14px the terminal readouts land on so every body line matches. */
+.era-title { font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.015em; margin: 0 0 10px; color: var(--fg-1); }
+.era-desc { font-size: var(--text-sm); line-height: 1.6; color: var(--fg-2); margin: 0; }
 
 /* ============================================================
    Contributors
