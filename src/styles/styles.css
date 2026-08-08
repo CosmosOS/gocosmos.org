@@ -711,7 +711,10 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 /* ============================================================
    Timeline
    ============================================================ */
-.timeline { list-style: none; padding: 0; margin: 0; max-width: 760px; margin: 0 auto; }
+/* Left rail on the full container width (aligned with the terminal readouts
+   and the link grid). No narrow max-width, so the description fills the body
+   column and reads on one line instead of wrapping into a cramped column. */
+.timeline { list-style: none; padding: 0; margin: 0; }
 .era { display: grid; grid-template-columns: 56px 1fr; gap: 20px; padding-bottom: 48px; }
 .era:last-child { padding-bottom: 0; }
 .era-rail { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
@@ -740,7 +743,7 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 [data-theme='light'] .era-tag-current { color: var(--fg-1); }
 .era-year { font-family: var(--font-mono); font-size: 12px; color: var(--fg-3); }
 .era-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 10px; color: var(--fg-1); }
-.era-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); margin: 0; max-width: 580px; }
+.era-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); margin: 0; }
 
 /* ============================================================
    Contributors
