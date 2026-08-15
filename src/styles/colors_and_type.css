@@ -78,6 +78,12 @@
   --text-6xl: 4.5rem;
   --text-7xl: 5.5rem;
 
+  /* Terminal/readout body line — the description size shared by the Features
+     specs, the Projects list and the Timeline eras. It is 0.75× the hero-cast
+     size (.term-block's clamp), so it scales with the viewport identically in
+     every section, floored at 11px where the vw term bottoms out on mobile. */
+  --readout-desc: max(11px, clamp(0.585rem, (100vw - 4rem) / 80, 0.885rem));
+
   /* ---------- Spacing (4px base) ---------- */
   --space-1: 4px;
   --space-2: 8px;

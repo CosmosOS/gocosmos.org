@@ -700,7 +700,7 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .spec-row[data-open] .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
 .spec-desc p {
   overflow: hidden; min-height: 0; margin: 0; padding: 0;
-  color: var(--fg-2); font-size: max(11px, 0.88em); line-height: 1.6;
+  color: var(--fg-2); font-size: var(--readout-desc); line-height: 1.6;
   max-width: 76ch;
 }
 /* On touch there is no hover — rows start collapsed and a tap toggles the
@@ -742,10 +742,13 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .era-tag-current { color: var(--halo, #F2EBDA); border-radius: 999px; }
 [data-theme='light'] .era-tag-current { color: var(--fg-1); }
 .era-year { font-family: var(--font-mono); font-size: 12px; color: var(--fg-3); }
-/* On the design-system scale: era name = cs-h3 step, description = --text-sm,
-   the same ~14px the terminal readouts land on so every body line matches. */
+/* Era name sits on the design-system scale at the cs-h3 step. The description
+   is set in the mono stack at --readout-desc, the exact size the terminal
+   readouts (spec-desc / proj-desc) use, so it reads as the same body line at
+   every width — matching px alone wasn't enough (mono and sans differ
+   optically, and the readouts scale with the viewport while a fixed px won't). */
 .era-title { font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.015em; margin: 0 0 10px; color: var(--fg-1); }
-.era-desc { font-size: var(--text-sm); line-height: 1.6; color: var(--fg-2); margin: 0; }
+.era-desc { font-family: var(--font-mono); font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2); margin: 0; }
 
 /* ============================================================
    Contributors
@@ -841,7 +844,7 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .proj-row.open .proj-name { text-decoration: underline; text-underline-offset: 3px; }
 .proj-desc {
   display: block; overflow: hidden; min-height: 0;
-  font-size: max(11px, 0.75em); line-height: 1.55; color: var(--fg-2);
+  font-size: var(--readout-desc); line-height: 1.55; color: var(--fg-2);
 }
 .proj-topics { color: var(--fg-3); font-size: 0.92em; }
 
