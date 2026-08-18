@@ -44,6 +44,9 @@ jobs:
           cp html/favicon.ico live/
           # The holding page's saucer sprite (from public/assets)
           cp html/assets/ufo-sprite.webp live/assets/
+          # Matrix federation + client discovery (public/.well-known/matrix):
+          # must survive the sync prune or gocosmos.org federation breaks
+          cp -r html/.well-known live/
           export RCLONE_CONFIG_DEPLOY_TYPE=sftp
           export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
           export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
