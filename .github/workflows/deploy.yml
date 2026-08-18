@@ -7,22 +7,23 @@ on:
 
 jobs:
   deploy:
-    runs-on: deploy
-    # Build needs node; overrides the runner's default docker:cli image
-    container: node:22-bookworm
+    runs-on: ubuntu-latest
     steps:
-      - name: Clone and build
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build
         run: |
-          set -e
-          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@git.amnesia.cloud/${{ github.repository }}.git"
-          git clone --depth 1 --branch master "$REPO_URL" site
-          cd site
           npm ci
           npm run build
 
       # UNDER CONSTRUCTION: production only gets the holding page (the full
       # site still builds above as a compile check, and local docker compose
-      # still serves it). To launch, sync site/html instead of live/.
+      # still serves it). To launch, sync html/ instead of live/.
       - name: Push holding page to gocosmos.org over SFTP
         env:
           SFTP_HOST: 000.web.punksky.com
@@ -31,7 +32,7 @@ jobs:
           SFTP_DOCROOT: web/gocosmos.org/public_html
         run: |
           set -e
-          apt-get update -qq && apt-get install -y -qq rclone
+          sudo apt-get update -qq && sudo apt-get install -y -qq rclone
           # SFTP, not FTP: punksky's FTP backend can't enter this account's
           # jail (500 OOPS: cannot change directory:/srv/jail/<user>) and
           # drops TLS right after PASS, which killed both lftp and rclone.
@@ -39,10 +40,10 @@ jobs:
           # is web/gocosmos.org/public_html. sync mirrors the source dir and
           # prunes everything else, so the built site never leaks to prod.
           mkdir -p live/assets
-          cp site/html/under-construction.html live/index.html
-          cp site/html/favicon.ico live/
+          cp html/under-construction.html live/index.html
+          cp html/favicon.ico live/
           # The holding page's saucer sprite (from public/assets)
-          cp site/html/assets/ufo-sprite.webp live/assets/
+          cp html/assets/ufo-sprite.webp live/assets/
           export RCLONE_CONFIG_DEPLOY_TYPE=sftp
           export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
           export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
