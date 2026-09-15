@@ -16,10 +16,21 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Install
+        run: npm ci
+
+      # Rebuilds src/data/contributors.json from the Cosmos commit history.
+      # Best effort: that file is committed, so a GitHub API blip deploys the
+      # last good snapshot instead of failing the whole deploy. GITHUB_TOKEN
+      # raises the limit to 1000 requests/hour; this needs ~140.
+      - name: Refresh contributor data
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run contributors
+
       - name: Build
-        run: |
-          npm ci
-          npm run build
+        run: npm run build
 
       - name: Push site to gocosmos.org over SFTP
         env:
