@@ -21,10 +21,7 @@ jobs:
           npm ci
           npm run build
 
-      # UNDER CONSTRUCTION: production only gets the holding page (the full
-      # site still builds above as a compile check, and local docker compose
-      # still serves it). To launch, sync html/ instead of live/.
-      - name: Push holding page to gocosmos.org over SFTP
+      - name: Push site to gocosmos.org over SFTP
         env:
           SFTP_HOST: 000.web.punksky.com
           SFTP_USER: ${{ secrets.FTP_USER }}
@@ -37,18 +34,15 @@ jobs:
           # jail (500 OOPS: cannot change directory:/srv/jail/<user>) and
           # drops TLS right after PASS, which killed both lftp and rclone.
           # The same credentials work over SSH on port 22, where the docroot
-          # is web/gocosmos.org/public_html. sync mirrors the source dir and
-          # prunes everything else, so the built site never leaks to prod.
-          mkdir -p live/assets
-          cp html/under-construction.html live/index.html
-          cp html/favicon.ico live/
-          # The holding page's saucer sprite (from public/assets)
-          cp html/assets/ufo-sprite.webp live/assets/
-          # Matrix federation + client discovery (public/.well-known/matrix):
-          # must survive the sync prune or gocosmos.org federation breaks
-          cp -r html/.well-known live/
+          # is web/gocosmos.org/public_html.
           export RCLONE_CONFIG_DEPLOY_TYPE=sftp
           export RCLONE_CONFIG_DEPLOY_HOST="$SFTP_HOST"
           export RCLONE_CONFIG_DEPLOY_USER="$SFTP_USER"
           export RCLONE_CONFIG_DEPLOY_PASS="$(rclone obscure "$SFTP_PASSWORD")"
-          rclone sync live "deploy:$SFTP_DOCROOT" -v --transfers 2
+          # sync mirrors the whole build and prunes whatever else is in the
+          # docroot. Matrix federation + client discovery ships as part of the
+          # build (public/.well-known/matrix), so it survives the prune.
+          # --delete-after keeps the old assets in place until the new build is
+          # fully uploaded: index.html names hash-stamped bundles, so pruning
+          # mid-transfer would break the page for anyone loading it just then.
+          rclone sync html "deploy:$SFTP_DOCROOT" -v --transfers 2 --delete-after
