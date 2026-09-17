@@ -11,10 +11,12 @@
 //
 // Usage: GITHUB_TOKEN=... node scripts/fetch-contributors.mjs
 // Without a token the API allows 60 requests/hour and this needs ~140.
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const OUT = fileURLToPath(new URL('../src/data/contributors.json', import.meta.url));
+const AVATAR_DIR = fileURLToPath(new URL('../public/assets/avatars/', import.meta.url));
 
 // Branch-scoped: `ref` is what separates the two generations inside the one
 // Cosmos repo. valentinbreiz/nativeaot-patcher (where Gen3 began) is NOT
@@ -79,8 +81,89 @@ async function fetchCommits({ repo, ref, gen }) {
 }
 
 const BOT = /\[bot\]$|^copilot(-|$)/i;
-/** CodePlex-era imports landed as "kudzu_cp" etc.; same human as "Kudzu". */
-const normName = n => (n || '').trim().toLowerCase().replace(/_cp$/, '');
+/**
+ * CodePlex-era imports landed as "kudzu_cp" etc.; same human as "Kudzu".
+ * Some authors also committed with an email as their name — keep only the
+ * local part, both to match the account and so no address can reach the page.
+ */
+const normName = n => (n || '').trim().toLowerCase().replace(/_cp$/, '').replace(/@.*$/, '');
+/** Punctuation-free form, so "charles.betros" finds the @charlesbetros account. */
+const compact = n => normName(n).replace(/[^a-z0-9]/g, '');
+/** Last guard: an email must never become a display name on the page. */
+const displayName = n => (n || '').replace(/@.*$/, '').replace(/_cp$/, '').trim();
+
+/**
+ * Every avatar slot gets an image, including the authors GitHub never linked
+ * to an account.
+ *
+ * GitHub cannot supply one for them. Its identicon is drawn from an account
+ * id, so with no account there is nothing to draw: the public fallback
+ * (avatars.githubusercontent.com/u/e?email=...) answers with one generic grey
+ * placeholder for every identity it cannot resolve — tried it, and 76 of
+ * these 82 came back byte-identical. Hot-linking it would also have put the
+ * hashed identity in the page, and for 25 of these authors that identity is a
+ * personal email address.
+ *
+ * So the identicon is drawn here instead: a GitHub-style 5x5 grid, mirrored
+ * down the middle, cells and hue taken from a digest of the person's identity.
+ * Deterministic (the same person keeps their avatar across builds), unique per
+ * person, and it costs no request at build time or in the browser.
+ */
+/** HSL to #rrggbb, so the identicon needs no CSS Color 4 support to render. */
+function hslHex(h, s, l) {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x]
+    : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
+}
+
+function writeIdenticons(people) {
+  const targets = people.filter(p => !p.avatar_url);
+  if (targets.length === 0) return;
+  mkdirSync(AVATAR_DIR, { recursive: true });
+
+  const wanted = new Set();
+  for (const person of targets) {
+    const digest = createHash('sha256').update(person.seed || person.login).digest();
+
+    // Muted mid-tone: legible on --bg-3 in both themes without competing with
+    // the cream accent. Saturation and lightness are fixed; only hue varies.
+    // Emitted as hex, not hsl(): the space-separated CSS Color 4 form is not
+    // understood by older browsers or by SVG rasterisers.
+    const fill = hslHex(((digest[0] << 8) | digest[1]) % 360, 0.38, 0.62);
+
+    // Left three columns come from the digest, then mirror for a symmetric
+    // face — the same construction GitHub uses.
+    let cells = '';
+    for (let y = 0; y < 5; y++) {
+      for (let x = 0; x < 3; x++) {
+        if ((digest[2 + y * 3 + x] & 1) === 0) continue;
+        cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+        if (x < 2) cells += `<rect x="${4 - x}" y="${y}" width="1" height="1"/>`;
+      }
+    }
+    // viewBox is inset by half a cell so the pattern sits inside the circular
+    // crop the avatar applies, rather than being clipped at the corners.
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 6 6" `
+      + `width="120" height="120" shape-rendering="crispEdges">`
+      + `<g fill="${fill}">${cells}</g></svg>`;
+
+    const slug = person.login.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+    const file = `${slug || 'contributor'}-${digest.toString('hex').slice(0, 8)}.svg`;
+    writeFileSync(`${AVATAR_DIR}${file}`, svg);
+    person.avatar_url = `/assets/avatars/${file}`;
+    wanted.add(file);
+  }
+
+  // Drop identicons for authors no longer in the history (a rewritten branch,
+  // an account that got linked since) so the directory cannot grow forever.
+  for (const file of readdirSync(AVATAR_DIR)) {
+    if (!wanted.has(file)) rmSync(`${AVATAR_DIR}${file}`);
+  }
+  console.log(`  identicons: ${wanted.size} generated into public/assets/avatars/`);
+}
 
 async function main() {
   if (!TOKEN) console.warn('No GITHUB_TOKEN — 60 req/hour, this will likely fail.\n');
@@ -94,6 +177,7 @@ async function main() {
   // so the same human's unlinked commits can be folded into the same entry.
   const byEmail = new Map();
   const byName = new Map();
+  const byCompact = new Map();
   const accounts = new Map();
   for (const { c } of commits) {
     const login = c.author?.login;
@@ -115,6 +199,8 @@ async function main() {
   for (const login of accounts.keys()) {
     const key = normName(login);
     if (key && !byName.has(key)) byName.set(key, login);
+    const tight = compact(login);
+    if (tight && !byCompact.has(tight)) byCompact.set(tight, login);
   }
 
   // Pass 2 — tally per generation against the resolved identity.
@@ -125,31 +211,51 @@ async function main() {
     let login = c.author?.login;
     if (!login && email) login = byEmail.get(email);
     if (!login) login = byName.get(normName(name));
+    if (!login) login = byCompact.get(compact(name));
     if (login && BOT.test(login)) continue;
     if (!login && (BOT.test(name || '') || !name)) continue;
 
     // Unlinked CodePlex-era authors have no GitHub account to point at; they
-    // still built Gen2, so they stay on the wall under their git name.
-    const key = login ? `@${login}` : `name:${normName(name)}`;
+    // still built Gen2, so they stay on the wall under their git name. Key
+    // them on the email rather than that name: the same person shows up under
+    // several spellings ("Freddie" and "Freddie Poser" on one address), and
+    // the CodePlex import gave each author a stable synthetic address, so the
+    // email is the steadier identity of the two.
+    const key = login ? `@${login}` : email ? `email:${email}` : `name:${normName(name)}`;
     let person = people.get(key);
     if (!person) {
       const account = login ? accounts.get(login) : null;
       person = {
-        login: login || name.replace(/_cp$/, ''),
+        login: login || displayName(name),
         linked: Boolean(login),
         html_url: account?.html_url || (login ? `https://github.com/${login}` : null),
         avatar_url: account?.avatar_url || null,
+        // What GitHub hashes to draw the identicon for an unlinked commit, so
+        // the avatar here matches the one on the commit page. The CodePlex
+        // import left an opaque hash in the email field for most of them;
+        // GitHub hashes that just the same. Never written to the JSON.
+        seed: email || normName(name),
         gen2: 0,
         gen3: 0,
       };
       people.set(key, person);
+    } else if (!person.linked) {
+      // "Freddie" then "Freddie Poser" — prefer the fuller spelling.
+      const candidate = displayName(name);
+      if (candidate.length > person.login.length) person.login = candidate;
     }
     person[gen] += 1;
   }
 
-  const contributors = [...people.values()]
+  const ranked = [...people.values()]
     .map(p => ({ ...p, contributions: p.gen2 + p.gen3 }))
     .sort((a, b) => b.contributions - a.contributions || a.login.localeCompare(b.login));
+
+  writeIdenticons(ranked);
+
+  // seed is a build-time detail — for 25 of these authors it is a personal
+  // email address, and the JSON ships to the browser. Drop it here.
+  const contributors = ranked.map(({ seed, ...rest }) => rest);
 
   mkdirSync(fileURLToPath(new URL('../src/data', import.meta.url)), { recursive: true });
   writeFileSync(OUT, `${JSON.stringify({
@@ -160,7 +266,8 @@ async function main() {
   const g2 = contributors.filter(p => p.gen2 > 0).length;
   const g3 = contributors.filter(p => p.gen3 > 0).length;
   console.log(`\ncontributors: ${contributors.length} total — ${g2} Gen2, ${g3} Gen3, ` +
-    `${contributors.filter(p => !p.linked).length} without a GitHub account`);
+    `${contributors.filter(p => !p.linked).length} without a GitHub account, ` +
+    `${contributors.filter(p => !p.avatar_url).length} without any avatar`);
 }
 
 await main();
