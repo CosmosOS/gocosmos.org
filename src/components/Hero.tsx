@@ -194,7 +194,7 @@ export function Hero() {
           Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on x64 or ARM64, no JIT, no managed runtime.
         </p>
         <div className="hero-ctas">
-          <a className="btn btn-secondary btn-lg glass" href="https://discord.com/invite/kwtBwv6jhD" target="_blank" rel="noreferrer">
+          <a className="btn btn-secondary btn-lg glass" href="https://chat.gocosmos.org/" target="_blank" rel="noreferrer">
             {ICONS.msg}<span>Join community</span>
           </a>
           <a className="btn btn-secondary btn-lg glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer">
