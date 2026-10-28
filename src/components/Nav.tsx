@@ -43,7 +43,6 @@ export function Nav() {
           <a href="#features">Features</a>
           <a href="#projects">Projects</a>
           <a href="#timeline">History</a>
-          <a href="#community">Community</a>
         </nav>
         <div className="nav-actions">
           {/* Both icons are always in the markup and CSS picks one via

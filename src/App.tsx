@@ -11,7 +11,6 @@ import { Features } from './components/Features';
 import { Timeline } from './components/Timeline';
 import { Contributors } from './components/Contributors';
 import { Projects } from './components/Projects';
-import { Community } from './components/Community';
 import { Footer } from './components/Footer';
 
 export function App() {
@@ -29,7 +28,6 @@ export function App() {
         <Projects />
         <Timeline />
         <Contributors />
-        <Community />
       </main>
       <Footer />
     </>

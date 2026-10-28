@@ -577,7 +577,6 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 @media (max-width: 560px) {
   #features { contain-intrinsic-size: auto 2100px; }
   #timeline { contain-intrinsic-size: auto 1000px; }
-  #community { contain-intrinsic-size: auto 1100px; }
   #projects { contain-intrinsic-size: auto 1250px; }
 }
 .section-tinted { background: linear-gradient(180deg, transparent 0%, rgba(15, 15, 21, 0.5) 50%, transparent 100%); }
@@ -854,42 +853,6 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .proj-foot-topic { color: var(--fg-1); }
 
 /* ============================================================
-   Community links
-   ============================================================ */
-.link-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-}
-@media (max-width: 880px) { .link-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .link-grid { grid-template-columns: 1fr; } }
-
-.link-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 18px;
-  border-radius: 14px;
-  text-decoration: none; color: inherit;
-  transition: border-color var(--dur-fast), transform var(--dur-fast);
-}
-@media (hover: hover) {
-  .link-card.glass:hover { border-color: rgba(255, 255, 255, 0.22); }
-  [data-theme='light'] .link-card.glass:hover { border-color: rgba(20, 20, 35, 0.20); }
-}
-.link-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: transparent; border: 1px solid var(--border-1);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--fg-1); flex-shrink: 0;
-}
-.link-icon svg { width: 16px; height: 16px; }
-.link-text { flex: 1; min-width: 0; }
-.link-text h3 { margin: 0 0 2px; font-size: 14px; font-weight: 600; color: var(--fg-1); }
-.link-text p { margin: 0; font-size: 12.5px; color: var(--fg-2); line-height: 1.45; }
-.link-arrow { color: var(--fg-3); display: flex; }
-.link-arrow svg { width: 14px; height: 14px; }
-@media (hover: hover) {
-  .link-card:hover .link-arrow { color: var(--fg-1); transform: translateX(2px); }
-}
-
-/* ============================================================
    Footer
    ============================================================ */
 .footer { border-top: 1px solid var(--border-1); padding: 64px 0 32px; }
@@ -928,8 +891,6 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
    ============================================================ */
 .btn:active,
 .icon-btn:active,
-.link-card.glass:active,
-.project-card.glass:active,
 .avatar:active {
   filter: brightness(0.92);
   transition: filter 80ms var(--ease-out);
@@ -946,6 +907,6 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 [data-theme='light'] :focus-visible { outline-color: var(--fg-1); }
 
 /* Fallback for engines that ignore scroll-padding on focus scrolling. */
-#top, #features, #projects, #timeline, #contributors, #community, #main {
+#top, #features, #projects, #timeline, #contributors, #main {
   scroll-margin-top: 84px;
 }

@@ -28,7 +28,7 @@ export function Footer() {
         </div>
       </div>
       <div className="container footer-fine">
-        <span>MIT licensed · © 2024 Kaleb McGhie (zarlo) and Cosmos contributors</span>
+        <span>BSD 3-Clause · © 2007-2026, CosmosOS, COSMOS Project and Cosmos contributors</span>
         <span className="footer-fine-right">Gen3</span>
       </div>
     </footer>
