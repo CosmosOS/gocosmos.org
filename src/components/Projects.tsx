@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ICONS } from '../icons';
+import { useI18n } from '../i18n';
 
 type Gen = 'gen2' | 'gen3';
 
@@ -78,6 +79,7 @@ function mergeProjects(results: { list: ApiRepo[]; gen: Gen }[]): Project[] {
 }
 
 export function Projects() {
+  const { t } = useI18n();
   const [list, setList] = useState<Project[] | null>(null);
   const [errored, setErrored] = useState(false);
   // Touch accordion: rows are links, so on hoverless devices the first tap
@@ -113,13 +115,11 @@ export function Projects() {
     <section className="section" id="projects">
       <div className="container">
         <div className="section-head" data-reveal>
-          <div className="cs-eyebrow">// built with cosmos</div>
-          <h2 className="cs-h1">Featured projects</h2>
+          <div className="cs-eyebrow">{t.projects.eyebrow}</div>
+          <h2 className="cs-h1">{t.projects.title}</h2>
           {/* role="status": the silent post-load swap to the snapshot copy is
               announced to screen readers. */}
-          <p className="section-sub" role="status">{errored
-            ? 'Projects couldn’t load from GitHub — showing a snapshot. Live data returns when GitHub is reachable again.'
-            : 'Don’t know where to start? See these projects to learn Cosmos by example and for inspiration!'}</p>
+          <p className="section-sub" role="status">{errored ? t.projects.subError : t.projects.sub}</p>
         </div>
         <div className="term-block" data-reveal>
           <div className="term-cmd" aria-hidden="true">
@@ -145,7 +145,7 @@ export function Projects() {
                         <span className="proj-owner">{p.owner}/</span>
                         <span className="proj-name">{p.name}</span>
                       </span>
-                      <span className="proj-stars">{ICONS.star}{p.stars}<span className="sr-only"> stars</span></span>
+                      <span className="proj-stars">{ICONS.star}{p.stars}<span className="sr-only">{t.projects.stars}</span></span>
                     </span>
                     <span className="proj-desc-wrap">
                       <span className="proj-desc">
@@ -163,7 +163,7 @@ export function Projects() {
           {/* Not aria-hidden: the count, data status and how-to-get-listed
               instruction are real content. "live" only after a real fetch. */}
           <div className="proj-foot">
-            {display.length} repos · {list && !errored ? 'live from GitHub' : 'snapshot'} · tag yours <span className="proj-foot-topic">cosmos-os</span> to appear here
+            {t.projects.repos(display.length)} · {list && !errored ? t.projects.live : t.projects.snapshot} · {t.projects.tagBefore}<span className="proj-foot-topic">cosmos-os</span>{t.projects.tagAfter}
           </div>
         </div>
       </div>

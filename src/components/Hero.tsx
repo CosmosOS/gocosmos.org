@@ -3,11 +3,13 @@ import type * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 import { ICONS } from '../icons';
 import { motionOff, subscribeMotion } from '../hooks/useMotion';
+import { useI18n } from '../i18n';
 
 /** Shown until the GitHub API answers (and if it never does). */
 const FALLBACK_VERSION = 'v3.0.79';
 
 export function Hero() {
+  const { t } = useI18n();
   const playerRef = useRef<HTMLDivElement>(null);
   const [version, setVersion] = useState(FALLBACK_VERSION);
 
@@ -183,22 +185,20 @@ export function Hero() {
       <div className="hero-inner">
         <div className="hero-eyebrow glass">
           <span className="gen-pill glass">GEN3</span>
-          <span>NativeAOT release · {version}</span>
+          <span>{t.hero.release} · {version}</span>
         </div>
         <h1 className="hero-title">
-          Write an OS in <span className="hero-accent glass">modern&nbsp;C#</span>.<br />
-          Compiled ahead-of-time.<br />
-          Runs on every hardware.
+          {t.hero.titleBefore}<span className="hero-accent glass">{t.hero.titleAccent}</span>{t.hero.titleAfter}<br />
+          {t.hero.titleLine2}<br />
+          {t.hero.titleLine3}
         </h1>
-        <p className="hero-sub">
-          Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on x64 or ARM64, no JIT, no managed runtime.
-        </p>
+        <p className="hero-sub">{t.hero.sub}</p>
         <div className="hero-ctas">
           <a className="btn btn-secondary btn-lg glass" href="https://chat.gocosmos.org/" target="_blank" rel="noreferrer">
-            {ICONS.msg}<span>Join community</span>
+            {ICONS.msg}<span>{t.hero.join}</span>
           </a>
           <a className="btn btn-secondary btn-lg glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer">
-            {ICONS.github}<span>Star on GitHub</span>
+            {ICONS.github}<span>{t.hero.star}</span>
           </a>
         </div>
       </div>
@@ -211,7 +211,7 @@ export function Hero() {
           className="term-scroll"
           role="region"
           tabIndex={0}
-          aria-label="Recording of cosmos build compiling the HelloWorld kernel, then cosmos run booting it in QEMU with live UART output"
+          aria-label={t.hero.recording}
         >
           <div className="term-player" ref={playerRef} />
         </div>

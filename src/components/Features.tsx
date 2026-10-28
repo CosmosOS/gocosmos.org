@@ -1,22 +1,9 @@
 import { useState } from 'react';
+import { useI18n, type SpecKey } from '../i18n';
 
-interface Spec {
-  key: string;
-  value: string;
-  desc: string;
-}
-
-const SPECS: Spec[] = [
-  { key: 'build', value: 'dotnet build → bootable ISO', desc: 'The Cosmos build pipeline runs NativeAOT codegen, assemble, link and pack a bootable ISO for the Limine bootloader.' },
-  { key: 'plugs', value: 'IL patching with Mono.Cecil', desc: 'Cosmos.Patcher replaces runtime methods at the IL level before NativeAOT compiles them.' },
-  { key: 'arch', value: 'x64 · ARM64 — RISC-V planned', desc: 'Target selected by RuntimeIdentifier: APIC interrupts on x64, GIC on ARM64, GAS assembly on both, MMIO where there is no port I/O.' },
-  { key: 'bcl', value: 'the real .NET BCL', desc: 'Strings, collections, generics, threading, Console — compiled by NativeAOT, no JIT, no managed runtime.' },
-  { key: 'kernel', value: 'GC · scheduler · exceptions', desc: 'Mark-and-sweep GC with precise stack scanning, a preemptive priority-based stride scheduler with lock support, exception handling with unwinding.' },
-  { key: 'net', value: 'System.Net.Sockets', desc: 'TCP and UDP sockets over Cosmos’ own network stack: ARP, IPv4, DHCP and DNS. HTTPS/TLS is on the roadmap.' },
-  { key: 'disk', value: 'System.IO down to the disk', desc: 'AHCI/SATA and NVMe drivers, MBR/GPT/EBR partitioning, FAT12/16/32 on a Unix-style VFS.' },
-  { key: 'gfx', value: 'Canvas · input', desc: 'Double-buffered Canvas API on the UEFI GOP framebuffer (via Limine), keyboard and mouse input.' },
-  { key: 'plat', value: 'ACPI · UART', desc: 'ACPI support through the LAI library, plus UART serial for logging and debugging the kernel.' },
-];
+/* The readout keys are what `cosmos --info` prints: they stay as they are in
+   every language. Values and descriptions come from the locale strings. */
+const SPEC_KEYS: SpecKey[] = ['build', 'plugs', 'arch', 'bcl', 'kernel', 'net', 'disk', 'gfx', 'plat'];
 
 /* The -hrr- planet, same as the Cosmos VS Code extension prints after
    `dotnet new cosmos-kernel`. Pure ASCII — every glyph exists in JetBrains
@@ -46,14 +33,16 @@ const ART = [
 ].join('\n');
 
 export function Features() {
+  const { t } = useI18n();
   const [open, setOpen] = useState<string | null>(null);
+  const SPECS = SPEC_KEYS.map(key => ({ key, ...t.features.specs[key] }));
   return (
     <section className="section section-tinted" id="features">
       <div className="container">
         <div className="section-head" data-reveal>
-          <div className="cs-eyebrow">// what's inside</div>
-          <h2 className="cs-h1">Everything you need to boot C# on bare metal.</h2>
-          <p className="section-sub">Gen3 replaces IL2CPU with the official .NET toolchain. Everything above it: GC, scheduler, drivers, network, filesystem is C# you can read, plug or replace.</p>
+          <div className="cs-eyebrow">{t.features.eyebrow}</div>
+          <h2 className="cs-h1">{t.features.title}</h2>
+          <p className="section-sub">{t.features.sub}</p>
         </div>
         <div className="term-block" data-reveal>
           <div className="term-cmd" aria-hidden="true">

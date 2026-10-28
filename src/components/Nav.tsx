@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { ICONS } from '../icons';
 import { useTheme } from '../hooks/useTheme';
 import { useMotionToggle } from '../hooks/useMotion';
+import { LOCALES, useI18n } from '../i18n';
 import { VortexLabel } from './VortexLabel';
 
 export function Nav() {
+  const { t, locale } = useI18n();
   const [theme, setTheme] = useTheme();
   const [motionOff, setMotionOff] = useMotionToggle();
   // State-bearing aria-labels only after mount: the prerendered HTML must be
@@ -40,17 +42,35 @@ export function Nav() {
           <img src="/assets/cosmos-logo.png" alt="Cosmos" />
         </a>
         <nav className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#projects">Projects</a>
-          <a href="#timeline">History</a>
+          <a href="#features">{t.nav.features}</a>
+          <a href="#projects">{t.nav.projects}</a>
+          <a href="#timeline">{t.nav.history}</a>
         </nav>
         <div className="nav-actions">
+          {/* Plain links to the other prerendered pages: each language is its
+              own URL, so a crawler and a bookmark both land on the right copy.
+              hreflang lets assistive tech announce the target language;
+              lang makes "中文" read in Chinese, not as English gibberish. */}
+          <nav className="lang-switch" aria-label={t.nav.language}>
+            {LOCALES.map(l => (
+              <a
+                key={l.code}
+                href={l.path}
+                hrefLang={l.lang}
+                lang={l.lang}
+                aria-label={l.name}
+                aria-current={l.code === locale ? 'page' : undefined}
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
           {/* Both icons are always in the markup and CSS picks one via
               [data-motion]/[data-theme], so the prerendered HTML matches on
               hydration whatever the stored preferences. */}
           <button
             className="icon-btn motion-toggle"
-            aria-label={mounted && motionOff ? 'Resume background animations' : 'Pause background animations'}
+            aria-label={mounted && motionOff ? t.nav.resumeMotion : t.nav.pauseMotion}
             onClick={() => setMotionOff(!motionOff)}
           >
             <span className="icon-pause">{ICONS.pause}</span>
@@ -58,15 +78,15 @@ export function Nav() {
           </button>
           <button
             className="icon-btn theme-toggle"
-            aria-label={mounted ? (theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme') : 'Toggle theme'}
+            aria-label={mounted ? (theme === 'dark' ? t.nav.toLight : t.nav.toDark) : t.nav.toggleTheme}
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           >
             <span className="icon-sun">{ICONS.sun}</span>
             <span className="icon-moon">{ICONS.moon}</span>
           </button>
           {/* aria-label keeps the name when ≤880px CSS hides the text span. */}
-          <a className="btn btn-secondary glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer" aria-label="GitHub">
-            {ICONS.github}<span>GitHub</span>
+          <a className="btn btn-secondary glass" href="https://github.com/CosmosOS/Cosmos/tree/gen3" target="_blank" rel="noreferrer" aria-label={t.nav.github}>
+            {ICONS.github}<span>{t.nav.github}</span>
           </a>
           <div className={`nav-cta${ctaShown ? ' is-visible' : ''}`}>
             <div className="nav-cta-inner">
@@ -75,9 +95,9 @@ export function Nav() {
                 href="https://cosmosos.github.io/"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Get started — Cosmos documentation"
+                aria-label={t.nav.getStartedLabel}
               >
-                <VortexLabel text="Get started" />
+                <VortexLabel text={t.nav.getStarted} />
               </a>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import data from '../data/contributors.json';
+import { useI18n } from '../i18n';
 
 interface Contributor {
   login: string;
@@ -18,25 +19,24 @@ interface Contributor {
 // its hardcoded fallback for everyone after the first few visitors.
 const CONTRIBUTORS = data.contributors as Contributor[];
 
-const fmt = new Intl.NumberFormat('en-US');
-
-/** "Gen2 · 2,907 commits" — what the avatar's tooltip and its label say. */
-function describe(c: Contributor): string {
-  const gens = [c.gen2 > 0 && 'Gen2', c.gen3 > 0 && 'Gen3'].filter(Boolean).join(' + ');
-  return `${gens} · ${fmt.format(c.contributions)} commit${c.contributions === 1 ? '' : 's'}`;
-}
-
 export function Contributors() {
+  const { t, info } = useI18n();
+  // Digit grouping follows the page language (2,907 / 2 907 / 2,907).
+  const fmt = new Intl.NumberFormat(info.lang);
+
+  /** "Gen2 · 2,907 commits" — what the avatar's tooltip and its label say. */
+  const describe = (c: Contributor): string => {
+    const gens = [c.gen2 > 0 && 'Gen2', c.gen3 > 0 && 'Gen3'].filter(Boolean).join(' + ');
+    return `${gens} · ${t.contributors.commits(c.contributions, fmt.format(c.contributions))}`;
+  };
+
   return (
     <section className="section" id="contributors">
       <div className="container">
         <div className="section-head" data-reveal>
-          <div className="cs-eyebrow">// the people</div>
-          <h2 className="cs-h1">Built by the community.</h2>
-          <p className="section-sub">
-            Every author in the Cosmos history — {fmt.format(CONTRIBUTORS.length)} people
-            across both generations, from the 2007 proof of concept to Gen3.
-          </p>
+          <div className="cs-eyebrow">{t.contributors.eyebrow}</div>
+          <h2 className="cs-h1">{t.contributors.title}</h2>
+          <p className="section-sub">{t.contributors.sub(fmt.format(CONTRIBUTORS.length))}</p>
         </div>
         <div className="avatar-wall" data-reveal>
           {CONTRIBUTORS.map(c => {
@@ -60,7 +60,7 @@ export function Contributors() {
                 href={c.html_url}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={`${label} — GitHub profile`}
+                aria-label={`${label} — ${t.contributors.profile}`}
                 title={label}
               >
                 {inner}
