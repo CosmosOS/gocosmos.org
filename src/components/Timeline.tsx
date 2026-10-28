@@ -1,33 +1,36 @@
-interface Era {
-  tag: string;
-  year: string;
-  title: string;
+interface Commit {
+  /* Decorative abbreviated SHA: the eras predate the GitHub history, so
+     there is no real object to point at. */
+  sha: string;
+  ref: { kind: 'tag' | 'head'; name: string };
+  date: string;
+  subject: string;
   body: string;
-  accent: 'fg-3' | 'gradient';
   current?: boolean;
 }
 
-const ERAS: Era[] = [
+/* Oldest first, like `git log --reverse`. */
+const COMMITS: Commit[] = [
   {
-    tag: 'Gen1',
-    year: '2007',
-    title: 'The proof.',
+    sha: '1d0c7a3',
+    ref: { kind: 'tag', name: 'gen1' },
+    date: '2007',
+    subject: 'The proof.',
     body: 'Original Cosmos. Proof that you could compile C# down to something that boots on bare metal. A small project with a big idea.',
-    accent: 'fg-3',
   },
   {
-    tag: 'Gen2',
-    year: '2010s — 2024',
-    title: 'IL2CPU era.',
+    sha: '7b2e94f',
+    ref: { kind: 'tag', name: 'gen2' },
+    date: '2010s — 2024',
+    subject: 'IL2CPU era.',
     body: "A custom IL-to-x86 compiler, built and maintained by the community for over a decade. IL2CPU translated .NET bytecode straight to assembly, and powered hobby OSes for years.",
-    accent: 'fg-3',
   },
   {
-    tag: 'Gen3',
-    year: 'Today',
-    title: 'NativeAOT.',
+    sha: 'e3a9c01',
+    ref: { kind: 'head', name: 'gen3' },
+    date: 'Today',
+    subject: 'NativeAOT.',
     body: "We retired 15 years of custom compiler work and stood on the shoulders of NativeAOT. Cosmos now patches .NET's official AOT pipeline at the IL level, modern language features, faster builds, less code to maintain.",
-    accent: 'gradient',
     current: true,
   },
 ];
@@ -41,24 +44,33 @@ export function Timeline() {
           <h2 className="cs-h1">Eighteen years of C# on the metal.</h2>
           <p className="section-sub">Cosmos has had three lives. Gen3 is the largest re-foundation since the project began.</p>
         </div>
-        <ol className="timeline">
-          {ERAS.map((era, i) => (
-            <li key={era.tag} className={`era ${era.current ? 'era-current' : ''}`} data-reveal>
-              <div className="era-rail">
-                <span className="era-node" />
-                {i < ERAS.length - 1 && <span className="era-line" />}
-              </div>
-              <div className="era-body">
-                <div className="era-meta">
-                  <span className={`era-tag ${era.current ? 'era-tag-current glass' : ''}`}>{era.tag}</span>
-                  <span className="era-year">{era.year}</span>
+        <div className="term-block" data-reveal>
+          <div className="term-cmd" aria-hidden="true">
+            <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ git log --reverse
+          </div>
+          <ol className="git-log">
+            {COMMITS.map(c => (
+              <li key={c.ref.name} className={`commit${c.current ? ' commit-current' : ''}`}>
+                <div className="commit-line">
+                  {/* The SHA is set dressing; the decoration carries the name. */}
+                  <span aria-hidden="true">commit {c.sha} </span>
+                  <span className="commit-decor">
+                    (
+                    {c.ref.kind === 'head'
+                      ? <><span className="commit-head">HEAD -&gt; </span><span className="commit-branch">{c.ref.name}</span></>
+                      : <span className="commit-tag">tag: {c.ref.name}</span>}
+                    )
+                  </span>
                 </div>
-                <h3 className={`era-title ${era.accent === 'gradient' ? 'hero-accent' : ''}`}>{era.title}</h3>
-                <p className="era-desc">{era.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+                <div className="commit-date">Date:   {c.date}</div>
+                <div className="commit-msg">
+                  <h3 className="commit-subject">{c.subject}</h3>
+                  <p className="commit-body">{c.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );

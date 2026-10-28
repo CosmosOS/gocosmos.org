@@ -82,7 +82,7 @@ export function Ufo() {
     // behind them, so it only shies away from the readout's bare text.
     // .term-player (the frameless hero cast), .term-cmd and .proj-list are
     // bare terminal text too, ever since the glass window came off.
-    const SHY_SELECTOR = '.hero-title, .hero-sub, .section-head, .section-sub, .era-title, .era-desc, .era-meta, .footer-tagline, .footer-cols, .footer-fine, .footer-brand, .readout-art, .readout-specs, .term-player, .term-cmd, .proj-list';
+    const SHY_SELECTOR = '.hero-title, .hero-sub, .section-head, .section-sub, .git-log, .footer-tagline, .footer-cols, .footer-fine, .footer-brand, .readout-art, .readout-specs, .term-player, .term-cmd, .proj-list';
     const SHY_PAD = 24;
     const MIN_SCALE = 0.4;
     const tugs = new WeakMap<HTMLElement, { x: number; y: number; o: number }>();

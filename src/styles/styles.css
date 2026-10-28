@@ -593,7 +593,7 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
   .section-head { margin-bottom: 40px; }
 }
 
-/* Accent helpers — glass pill in the hero, plain accent text in the timeline */
+/* Accent helper — the glass pill in the hero title */
 .hero-accent {
   display: inline-block;
   color: var(--halo, #F2EBDA);
@@ -605,8 +605,6 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
    (cream on off-white text) with slate on near-black text so light mode
    stays strictly monochrome. */
 [data-theme='light'] .hero-accent { color: var(--fg-1); }
-.era-title.hero-accent { color: var(--halo, #F2EBDA); padding: 0; }
-[data-theme='light'] .era-title.hero-accent { color: var(--fg-1); }
 
 /* ============================================================
    Features — system readout (neofetch-style `cosmos --info`)
@@ -614,7 +612,7 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
    everything is theme tokens. Same width as the hero terminal
    (full container).
    ============================================================ */
-/* Shared chrome for the terminal sections (Features + Projects):
+/* Shared chrome for the terminal sections (Features, Projects, Timeline):
    same inset, same command line, one idle prompt at the very end. */
 /* Same glyph size as the hero cast: the player fits 100 cols into the
    container (1200px cap minus 2×32px padding) and JetBrains Mono advances
@@ -709,46 +707,48 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 @media (hover: none) { .spec-row { padding: 14px 12px; } }
 
 /* ============================================================
-   Timeline
+   Timeline — `git log --reverse` readout
+   Same frameless terminal language as the Features and Projects
+   readouts: mono, theme tokens, the cast-size scale. Three
+   commits, oldest first, each in git's medium format (commit
+   line, Date, then the indented subject and body). Nothing here
+   is interactive, so there are no hover rows — the body is the
+   section's content and stays visible.
    ============================================================ */
-/* Left rail on the full container width (aligned with the terminal readouts
-   and the link grid). No narrow max-width, so the description fills the body
-   column and reads on one line instead of wrapping into a cramped column. */
-.timeline { list-style: none; padding: 0; margin: 0; }
-.era { display: grid; grid-template-columns: 56px 1fr; gap: 20px; padding-bottom: 48px; }
-.era:last-child { padding-bottom: 0; }
-.era-rail { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
-.era-node {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: var(--bg-3); border: 2px solid var(--border-2);
-  flex-shrink: 0; z-index: 2;
+.git-log { list-style: none; margin: 0; padding: 0; line-height: 1.6; }
+.commit + .commit { margin-top: 1.75em; }
+/* git paints the commit line and its decoration yellow; the site's
+   "yellow" is the cream halo, the same highlight ink as .spec-key and
+   .proj-name. HEAD and the branch keep git's cyan/green from the cast
+   palette (.term-user is that green). Light mode re-inks everything slate
+   like the prompt does — the page stays monochrome. */
+.commit-line { font-size: 1em; color: var(--halo, #F2EBDA); }
+.commit-head { color: #4DD0E1; font-weight: 700; }
+.commit-branch { color: #3DDC84; font-weight: 700; }
+[data-theme='light'] .commit-line { color: var(--fg-1); font-weight: 600; }
+[data-theme='light'] .commit-head, [data-theme='light'] .commit-branch { color: var(--fg-1); }
+/* pre: keeps git's three-space `Date:   ` alignment. */
+.commit-date { white-space: pre; font-size: max(11px, 0.85em); color: var(--fg-3); }
+/* The message block: git indents it by four columns. The indent sits on
+   the wrapper (one 4ch at the block's 1em) so the subject and the smaller
+   body share the same left edge. Subject at the listing's primary weight
+   (.proj-name); body at --readout-desc, the description size the other
+   readouts expand to on hover. */
+.commit-msg { margin-top: 0.75em; padding-left: 4ch; }
+.commit-subject {
+  margin: 0; font-family: inherit; font-size: 1em; font-weight: 600;
+  line-height: 1.6; letter-spacing: 0; color: var(--fg-1);
 }
-.era-current .era-node {
-  background: var(--halo, #F2EBDA); border-color: transparent;
-  box-shadow: 0 0 0 3px rgba(242, 235, 218, 0.22), 0 0 18px rgba(242, 235, 218, 0.45);
+.commit-current .commit-subject { color: var(--halo, #F2EBDA); }
+[data-theme='light'] .commit-current .commit-subject { color: var(--fg-1); }
+.commit-body {
+  margin: 0.35em 0 0;
+  font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2);
+  max-width: 76ch;
 }
-.era-line {
-  position: absolute; top: 18px; bottom: -48px; left: 50%;
-  width: 1px; transform: translateX(-50%);
-  background: linear-gradient(180deg, var(--border-2), var(--border-1));
-}
-.era-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.era-tag {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  padding: 4px 10px; border-radius: 999px;
-  background: var(--bg-3); color: var(--fg-2); border: 1px solid var(--border-1);
-  letter-spacing: 0.04em;
-}
-.era-tag-current { color: var(--halo, #F2EBDA); border-radius: 999px; }
-[data-theme='light'] .era-tag-current { color: var(--fg-1); }
-.era-year { font-family: var(--font-mono); font-size: 12px; color: var(--fg-3); }
-/* Era name sits on the design-system scale at the cs-h3 step. The description
-   is set in the mono stack at --readout-desc, the exact size the terminal
-   readouts (spec-desc / proj-desc) use, so it reads as the same body line at
-   every width — matching px alone wasn't enough (mono and sans differ
-   optically, and the readouts scale with the viewport while a fixed px won't). */
-.era-title { font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.015em; margin: 0 0 10px; color: var(--fg-1); }
-.era-desc { font-family: var(--font-mono); font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2); margin: 0; }
+/* Narrow phones: the indent costs 4 of ~40 columns, drop it (same call as
+   .spec-desc). */
+@media (max-width: 560px) { .commit-msg { padding-left: 0; } }
 
 /* ============================================================
    Contributors
