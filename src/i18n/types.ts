@@ -47,12 +47,11 @@ export interface Strings {
     eyebrow: string;
     title: string;
     sub: string;
-    subError: string;
     /** Screen-reader suffix after a star count (" stars"). */
     stars: string;
     repos: (n: number) => string;
-    live: string;
-    snapshot: string;
+    /** "updated 2026-10-29" — the build date of the list, ISO as the shell would print it. */
+    updated: (date: string) => string;
     /** "tag yours <cosmos-os> to appear here", split around the topic. */
     tagBefore: string;
     tagAfter: string;

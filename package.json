@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "contributors": "node scripts/fetch-contributors.mjs",
+    "projects": "node scripts/fetch-projects.mjs",
     "typecheck": "tsc --noEmit",
-    "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "build": "node scripts/fetch-projects.mjs && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,0 +1,533 @@
+{
+  "generatedAt": "2026-10-29",
+  "projects": [
+    {
+      "owner": "aura-systems",
+      "name": "Aura-Operating-System",
+      "html_url": "https://github.com/aura-systems/Aura-Operating-System",
+      "description": "AuraOS, the Franco-English Operating System developed in C# using Cosmos!",
+      "stars": 290,
+      "topics": [
+        "aura",
+        "aura-kernel",
+        "aura-operating"
+      ]
+    },
+    {
+      "owner": "Project-Prism",
+      "name": "Prism-OS",
+      "html_url": "https://github.com/Project-Prism/Prism-OS",
+      "description": "An operating system written in C#, Made possible by the cosmos community!",
+      "stars": 90,
+      "topics": [
+        "csharp",
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "LumaTechnologies",
+      "name": "SphereOS",
+      "html_url": "https://github.com/LumaTechnologies/SphereOS",
+      "description": "SphereOS - An operating system written in C#, powered by Cosmos.",
+      "stars": 74,
+      "topics": [
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "Ncleardev",
+      "name": "NclearOS-2",
+      "html_url": "https://github.com/Ncleardev/NclearOS-2",
+      "description": "Cosmos based Operating System with GUI.",
+      "stars": 42,
+      "topics": [
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "Adisol07",
+      "name": "SaphireOS",
+      "html_url": "https://github.com/Adisol07/SaphireOS",
+      "description": "New operating system",
+      "stars": 24,
+      "topics": [
+        "csharp",
+        "csharp-code",
+        "csharp-library"
+      ]
+    },
+    {
+      "owner": "ascpixi",
+      "name": "cosmos-coroutines",
+      "html_url": "https://github.com/ascpixi/cosmos-coroutines",
+      "description": "⏱ A simple, non-preemptive coroutine scheduler that allows for cooperative multitasking within Cosmos kernels",
+      "stars": 22,
+      "topics": [
+        "cooperative-multitasking",
+        "coroutines",
+        "csharp"
+      ]
+    },
+    {
+      "owner": "AAM1075",
+      "name": "XenOS",
+      "html_url": "https://github.com/AAM1075/XenOS",
+      "description": "XenOS is an operating system written in .NET C# and is made possible by the Cosmos OS project.",
+      "stars": 15,
+      "topics": [
+        "c-sharp",
+        "dotnet",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "mirage-desktop",
+      "name": "Mirage-classic",
+      "html_url": "https://github.com/mirage-desktop/Mirage-classic",
+      "description": "Mirage Desktop Environment (Classic)",
+      "stars": 12,
+      "topics": [
+        "csharp"
+      ]
+    },
+    {
+      "owner": "DogOSdev",
+      "name": "DogOS",
+      "html_url": "https://github.com/DogOSdev/DogOS",
+      "description": "A Operating System made with Cosmos and in C#. 🐕",
+      "stars": 9,
+      "topics": [
+        "csharp",
+        "dotnet",
+        "dotnet-core"
+      ]
+    },
+    {
+      "owner": "xccoreco",
+      "name": "DuskOS",
+      "html_url": "https://github.com/xccoreco/DuskOS",
+      "description": "Dusk Operating System Made In Comsos",
+      "stars": 8,
+      "topics": []
+    },
+    {
+      "owner": "DuskOS-Group",
+      "name": "DuskOS",
+      "html_url": "https://github.com/DuskOS-Group/DuskOS",
+      "description": "A C#/COSMSOS-based operating system, designed to be used on any system.",
+      "stars": 6,
+      "topics": [
+        "csharp",
+        "desktop",
+        "mit-license"
+      ]
+    },
+    {
+      "owner": "GeorgeFence",
+      "name": "PatchOSProject",
+      "html_url": "https://github.com/GeorgeFence/PatchOSProject",
+      "description": "PatchOS is operating system made in C# with Cosmos",
+      "stars": 5,
+      "topics": [
+        "csharp",
+        "kernel",
+        "opensource"
+      ]
+    },
+    {
+      "owner": "9xbt",
+      "name": "mango",
+      "html_url": "https://github.com/9xbt/mango",
+      "description": "A powerful C# Cosmos OS that has unix-like commands & file paths",
+      "stars": 4,
+      "topics": [
+        "gui",
+        "os"
+      ]
+    },
+    {
+      "owner": "ArGul-0",
+      "name": "ArGulOS",
+      "html_url": "https://github.com/ArGul-0/ArGulOS",
+      "description": "A small operating system written in C# using cosmos.",
+      "stars": 4,
+      "topics": [
+        "csharp",
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "Owen2k6",
+      "name": "GoOS",
+      "html_url": "https://github.com/Owen2k6/GoOS",
+      "description": "GoOS is a small scaled operating system made with Cosmos",
+      "stars": 4,
+      "topics": [
+        "goos"
+      ]
+    },
+    {
+      "owner": "zarlo",
+      "name": "Kanga",
+      "html_url": "https://github.com/zarlo/Kanga",
+      "description": "A widget framework for Cosmos",
+      "stars": 4,
+      "topics": [
+        "framework",
+        "widget",
+        "widget-library"
+      ]
+    },
+    {
+      "owner": "kumja1",
+      "name": "Architect",
+      "html_url": "https://github.com/kumja1/Architect",
+      "description": "Architect widget framework for CosmosOS",
+      "stars": 3,
+      "topics": [
+        "widget-framework"
+      ]
+    },
+    {
+      "owner": "Ncleardev",
+      "name": "NclearOS",
+      "html_url": "https://github.com/Ncleardev/NclearOS",
+      "description": "Cosmos based Console Operating System.",
+      "stars": 3,
+      "topics": [
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "pmgdev64",
+      "name": "KawaiiOS_v1.0.0_build_1010",
+      "html_url": "https://github.com/pmgdev64/KawaiiOS_v1.0.0_build_1010",
+      "description": "KawaiiOS Is A Based x86-86 C# Operating System, Which This OS Is Created Using Cosmos And C#.",
+      "stars": 3,
+      "topics": [
+        "csharp",
+        "operating-system",
+        "x86-64"
+      ]
+    },
+    {
+      "owner": "sametbilir33",
+      "name": "HolmiumOS",
+      "html_url": "https://github.com/sametbilir33/HolmiumOS",
+      "description": "A operating system made with CosmosOS.",
+      "stars": 3,
+      "topics": [
+        "csharp",
+        "holmiumos"
+      ]
+    },
+    {
+      "owner": "SammaWasTaken",
+      "name": "Cosm3D",
+      "html_url": "https://github.com/SammaWasTaken/Cosm3D",
+      "description": "3D capabilities for VMwareSvgaII",
+      "stars": 3,
+      "topics": [
+        "3d",
+        "csharp",
+        "gl"
+      ]
+    },
+    {
+      "owner": "thatsacrylic",
+      "name": "Aqua",
+      "html_url": "https://github.com/thatsacrylic/Aqua",
+      "description": "Aqua is an operating system made using the Cosmos C# Operating System kit, and is designed to keep your computer secure, fast, and efficient.",
+      "stars": 3,
+      "topics": [
+        "aqua",
+        "operatingsystem"
+      ]
+    },
+    {
+      "owner": "9xbt",
+      "name": "SVGAIITerminal",
+      "html_url": "https://github.com/9xbt/SVGAIITerminal",
+      "description": "C# terminal emulator",
+      "stars": 2,
+      "topics": [
+        "csharp",
+        "terminal-emulator"
+      ]
+    },
+    {
+      "owner": "abirpahlwan",
+      "name": "TingTingOS",
+      "html_url": "https://github.com/abirpahlwan/TingTingOS",
+      "description": "An operating system based on COSMOS",
+      "stars": 2,
+      "topics": [
+        "csharp",
+        "operating",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "DisableGraphics",
+      "name": "SigOS",
+      "html_url": "https://github.com/DisableGraphics/SigOS",
+      "description": "A simple operating system made with COSMOS in C#",
+      "stars": 2,
+      "topics": [
+        "csharp",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "Guillermo-Santos",
+      "name": "Zaphyros",
+      "html_url": "https://github.com/Guillermo-Santos/Zaphyros",
+      "description": "An OS Writed on C# using Cosmos Development Toolkit.",
+      "stars": 2,
+      "topics": []
+    },
+    {
+      "owner": "MrBisquit",
+      "name": "Banana-OS-Basic-V2",
+      "html_url": "https://github.com/MrBisquit/Banana-OS-Basic-V2",
+      "description": "An Advanced Cosmos OS built in C#",
+      "stars": 2,
+      "topics": [
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "Schaapie-D",
+      "name": "HontelOS",
+      "html_url": "https://github.com/Schaapie-D/HontelOS",
+      "description": "An Operating System made in C# based on Cosmos.",
+      "stars": 2,
+      "topics": [
+        "csharp",
+        "csharp-os",
+        "hontel"
+      ]
+    },
+    {
+      "owner": "Tin-Systems-Platform",
+      "name": "Tinos3",
+      "html_url": "https://github.com/Tin-Systems-Platform/Tinos3",
+      "description": "",
+      "stars": 2,
+      "topics": []
+    },
+    {
+      "owner": "yukihana-project",
+      "name": "YukihanaOS",
+      "html_url": "https://github.com/yukihana-project/YukihanaOS",
+      "description": "CosmosOS based operating system",
+      "stars": 2,
+      "topics": [
+        "kernel",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "z-izz",
+      "name": "ziOS",
+      "html_url": "https://github.com/z-izz/ziOS",
+      "description": "A kind-of powerful and unique OS made with Cosmos.",
+      "stars": 2,
+      "topics": [
+        "csharp",
+        "os"
+      ]
+    },
+    {
+      "owner": "bennytrt",
+      "name": "AtOS",
+      "html_url": "https://github.com/bennytrt/AtOS",
+      "description": "AtOS is a C# written OS (Operating System) Using The Cosmos Operating System Development Kit",
+      "stars": 1,
+      "topics": [
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "CodeCs1",
+      "name": "TerminalOS_L",
+      "html_url": "https://github.com/CodeCs1/TerminalOS_L",
+      "description": "The Kernel based on Cosmos C# (used to restore the old version of TerminalOS)",
+      "stars": 1,
+      "topics": [
+        "csharp",
+        "terminalos",
+        "x86"
+      ]
+    },
+    {
+      "owner": "McNoswald",
+      "name": "Sia-OS",
+      "html_url": "https://github.com/McNoswald/Sia-OS",
+      "description": "A Command Line Operating System created in C# using Cosmos OS",
+      "stars": 1,
+      "topics": [
+        "operating-system",
+        "virtual-machine",
+        "vmware"
+      ]
+    },
+    {
+      "owner": "nexusos-devs",
+      "name": "nexusos-csharp",
+      "html_url": "https://github.com/nexusos-devs/nexusos-csharp",
+      "description": "Operating System written in C# by Zeroday using COSMOS Framework. System is running in Graphics Mode, but you can also switch to Bash Mode after Installing & Launching System.",
+      "stars": 1,
+      "topics": [
+        "operating-system",
+        "osdev"
+      ]
+    },
+    {
+      "owner": "pmgdev64",
+      "name": "Nexon_Kernel",
+      "html_url": "https://github.com/pmgdev64/Nexon_Kernel",
+      "description": "Nexon Kernel Is An Cosmos-Based, lightweight Operating System. This Operating system is very basic than Linux and Easy-to-use and develop the program.  You can custom your User Interface by Install the simple program (like source code, compiled program) or personalize your User Interface..",
+      "stars": 1,
+      "topics": [
+        "csharp",
+        "operating-system",
+        "os-development"
+      ]
+    },
+    {
+      "owner": "ritikasarkar18",
+      "name": "OS-Project",
+      "html_url": "https://github.com/ritikasarkar18/OS-Project",
+      "description": "A CLI based OS using Cosmos OS SDK",
+      "stars": 1,
+      "topics": [
+        "csharp"
+      ]
+    },
+    {
+      "owner": "SanskarSontakke",
+      "name": "WindOS",
+      "html_url": "https://github.com/SanskarSontakke/WindOS",
+      "description": "A custom operating system built in C# using COSMOS dev kit, featuring a graphical interface with window management, file system, and built-in applications.",
+      "stars": 1,
+      "topics": [
+        "graphical-user-interface",
+        "graphics-programming",
+        "kernel"
+      ]
+    },
+    {
+      "owner": "Vovo4k",
+      "name": "VlaicuLite",
+      "html_url": "https://github.com/Vovo4k/VlaicuLite",
+      "description": "Lite Version Of VlaicuOS",
+      "stars": 1,
+      "topics": [
+        "csharp"
+      ]
+    },
+    {
+      "owner": "Guillermo-Santos",
+      "name": "System.Activator.Plugs",
+      "html_url": "https://github.com/Guillermo-Santos/System.Activator.Plugs",
+      "description": "Development of Plugs for `System.Activator` class for Cosmos",
+      "stars": 0,
+      "topics": []
+    },
+    {
+      "owner": "project-novagon",
+      "name": "freeshellOS",
+      "html_url": "https://github.com/project-novagon/freeshellOS",
+      "description": "a Operating system based on Freeshell.",
+      "stars": 0,
+      "topics": [
+        "dotnet",
+        "os"
+      ]
+    },
+    {
+      "owner": "R0fael",
+      "name": "ADOS",
+      "html_url": "https://github.com/R0fael/ADOS",
+      "description": "Dos system(console system) from 0 made by R0fael. In future will added GUI. I can create GUI!",
+      "stars": 0,
+      "topics": [
+        "free",
+        "open-source",
+        "os"
+      ]
+    },
+    {
+      "owner": "RadiantCorium",
+      "name": "RainOS-Base",
+      "html_url": "https://github.com/RadiantCorium/RainOS-Base",
+      "description": "The base for the RainOS Operating System",
+      "stars": 0,
+      "topics": [
+        "operating-system",
+        "os"
+      ]
+    },
+    {
+      "owner": "shuv001",
+      "name": "NothingOs",
+      "html_url": "https://github.com/shuv001/NothingOs",
+      "description": "A simple command-line operating system built with C# and the Cosmos DevKit. Supports basic file manipulation and arithmetic operations.",
+      "stars": 0,
+      "topics": [
+        "csharp",
+        "educational-project",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "sneeoosh",
+      "name": "uraniumOS",
+      "html_url": "https://github.com/sneeoosh/uraniumOS",
+      "description": "an os made with cosmos",
+      "stars": 0,
+      "topics": []
+    },
+    {
+      "owner": "TheMysteriousStranger90",
+      "name": "TheSailOS",
+      "html_url": "https://github.com/TheMysteriousStranger90/TheSailOS",
+      "description": "The Sail OS is an operating system built using C# and the Cosmos (C# Open Source Managed Operating System) framework.",
+      "stars": 0,
+      "topics": [
+        "csharp",
+        "dotnet",
+        "operating-system"
+      ]
+    },
+    {
+      "owner": "tonytins",
+      "name": "VentureOS",
+      "html_url": "https://github.com/tonytins/VentureOS",
+      "description": "Named after the Siemens' passenger cars, VentureOS is my hobby operating system written in C# and based on the Cosmos framework.",
+      "stars": 0,
+      "topics": [
+        "csharp",
+        "dotnet",
+        "kernel"
+      ]
+    },
+    {
+      "owner": "z-izz",
+      "name": "fetchOS",
+      "html_url": "https://github.com/z-izz/fetchOS",
+      "description": "A very bad clone of neofetch, but it's bootable",
+      "stars": 0,
+      "topics": [
+        "neofetch-clone",
+        "os"
+      ]
+    }
+  ]
+}
