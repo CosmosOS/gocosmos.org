@@ -18,6 +18,8 @@ export interface LocaleInfo {
   label: string;
   /** The language's own name, for the switcher link's accessible name. */
   name: string;
+  /** Extra stylesheet this locale needs (a script the Latin webfonts lack). */
+  webfont?: string;
 }
 
 /* English is the reference and lives at the root; the others are sub-paths.
@@ -25,7 +27,12 @@ export interface LocaleInfo {
 export const LOCALES: readonly LocaleInfo[] = [
   { code: 'en', lang: 'en', path: '/', label: 'EN', name: 'English' },
   { code: 'fr', lang: 'fr', path: '/fr/', label: 'FR', name: 'Français' },
-  { code: 'zh', lang: 'zh-Hans', path: '/zh/', label: '中文', name: '中文（简体）' },
+  {
+    code: 'zh', lang: 'zh-Hans', path: '/zh/', label: '中文', name: '中文（简体）',
+    // Google serves it sliced by unicode-range, so a page only downloads the
+    // slices covering the characters it actually uses.
+    webfont: 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap',
+  },
 ];
 
 export const STRINGS: Record<Locale, Strings> = { en, fr, zh };

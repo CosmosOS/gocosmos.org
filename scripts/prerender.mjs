@@ -28,7 +28,8 @@ const alternates = LOCALES.map(l => `  <link rel="alternate" hreflang="${l.lang}
 
 for (const locale of LOCALES) {
   const { meta } = STRINGS[locale.code];
-  const head = `  <link rel="canonical" href="${SITE}${locale.path}">\n${alternates}\n</head>`;
+  const webfont = locale.webfont ? `  <link rel="stylesheet" href="${locale.webfont}">\n` : '';
+  const head = `${webfont}  <link rel="canonical" href="${SITE}${locale.path}">\n${alternates}\n</head>`;
   const html = template
     .replace('<html lang="en"', `<html lang="${locale.lang}"`)
     .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(meta.title)}</title>`)
