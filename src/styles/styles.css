@@ -771,10 +771,12 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 }
 .commit-current .commit-subject { color: var(--halo, #F2EBDA); }
 [data-theme='light'] .commit-current .commit-subject { color: var(--fg-1); }
+/* No measure cap here, unlike .spec-desc p: those sit in the readout's right
+   column, this body is the section's content and fills the terminal width
+   like the command line above it. */
 .commit-body {
   margin: 0.35em 0 0;
   font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2);
-  max-width: 76ch;
 }
 /* Narrow phones: the indent costs 4 of ~40 columns, drop it (same call as
    .spec-desc). */
