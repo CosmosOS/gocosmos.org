@@ -76,6 +76,11 @@ html:lang(zh-Hans) {
   --font-sans: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', ui-monospace, Menlo, Consolas, monospace;
 }
+/* At 14px, Noto Sans SC Regular reads a notch lighter than Geist Regular
+   (hairline strokes on the dark page); Medium is the optical match. Only
+   the small link text needs it, the 16px+ copy holds its weight. */
+html:lang(zh-Hans) .nav-links a,
+html:lang(zh-Hans) .footer-cols a { font-weight: 500; }
 
 :root {
   /* ---------- Type scale (rem so browser font-size preferences apply) ---------- */
