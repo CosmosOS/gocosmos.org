@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import data from '../data/projects.json';
 import { ICONS } from '../icons';
 import { useI18n } from '../i18n';
+import { useSteadyHeight } from '../hooks/useSteadyHeight';
 
 interface Project {
   owner: string;
@@ -18,12 +19,22 @@ interface Project {
 // endpoint allows 10 requests/minute per IP unauthenticated).
 const PROJECTS = (data.projects as Project[]).slice(0, 12);
 
+// Two independent columns, ranking down the first then the second: a row
+// expanding on hover only pushes the rows below it in its own column (one
+// shared grid would move the other column too). See .proj-list in CSS.
+const HALF = Math.ceil(PROJECTS.length / 2);
+const COLUMNS = [0, HALF]
+  .map(start => PROJECTS.slice(start, start + HALF).map((project, j) => ({ project, rank: start + j })))
+  .filter(column => column.length > 0);
+
 export function Projects() {
   const { t } = useI18n();
   // Touch accordion: rows are links, so on hoverless devices the first tap
   // expands the description and only a second tap follows the link.
   const [touch, setTouch] = useState(false);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const blockRef = useRef<HTMLDivElement>(null);
+  useSteadyHeight(blockRef);
 
   useEffect(() => {
     setTouch(window.matchMedia('(hover: none)').matches);
@@ -37,45 +48,50 @@ export function Projects() {
           <h2 className="cs-h1">{t.projects.title}</h2>
           <p className="section-sub">{t.projects.sub}</p>
         </div>
-        <div className="term-block" data-reveal>
+        <div className="term-block" data-reveal ref={blockRef}>
           <div className="term-cmd" aria-hidden="true">
             <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ ls community/ --sort=stars
           </div>
-          <ol className="proj-list" style={{ gridTemplateRows: `repeat(${Math.ceil(PROJECTS.length / 2)}, auto)` }}>
-            {PROJECTS.map((p, i) => (
-              <li key={`${p.owner}/${p.name}`}>
-                <a
-                  className={`proj-row${touch && openIdx === i ? ' open' : ''}`}
-                  href={p.html_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-expanded={touch ? openIdx === i : undefined}
-                  // e.detail === 0 is a keyboard "click": Enter always follows
-                  // the link (focus already revealed the description).
-                  onClick={touch && openIdx !== i ? e => { if (e.detail === 0) return; e.preventDefault(); setOpenIdx(i); } : undefined}
-                >
-                  <span className="proj-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="proj-main">
-                    <span className="proj-line">
-                      <span className="proj-slug">
-                        <span className="proj-owner">{p.owner}/</span>
-                        <span className="proj-name">{p.name}</span>
+          <div className="proj-list">
+            {COLUMNS.map((column, c) => (
+              <ol key={c} className="proj-col" start={column[0].rank + 1}>
+                {column.map(({ project: p, rank: i }) => (
+                  <li key={`${p.owner}/${p.name}`}>
+                    <a
+                      className="proj-row term-row"
+                      data-open={(touch && openIdx === i) || undefined}
+                      href={p.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-expanded={touch ? openIdx === i : undefined}
+                      // e.detail === 0 is a keyboard "click": Enter always follows
+                      // the link (focus already revealed the description).
+                      onClick={touch && openIdx !== i ? e => { if (e.detail === 0) return; e.preventDefault(); setOpenIdx(i); } : undefined}
+                    >
+                      <span className="proj-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="proj-main">
+                        <span className="proj-line">
+                          <span className="proj-slug">
+                            <span className="proj-owner">{p.owner}/</span>
+                            <span className="proj-name">{p.name}</span>
+                          </span>
+                          <span className="proj-stars">{ICONS.star}{p.stars}<span className="sr-only">{t.projects.stars}</span></span>
+                        </span>
+                        <span className="term-reveal">
+                          <span className="proj-desc">
+                            {p.description}
+                            {p.topics.length > 0 && (
+                              <span className="proj-topics">{' '}{p.topics.map(t => `#${t}`).join(' ')}</span>
+                            )}
+                          </span>
+                        </span>
                       </span>
-                      <span className="proj-stars">{ICONS.star}{p.stars}<span className="sr-only">{t.projects.stars}</span></span>
-                    </span>
-                    <span className="proj-desc-wrap">
-                      <span className="proj-desc">
-                        {p.description}
-                        {p.topics.length > 0 && (
-                          <span className="proj-topics">{' '}{p.topics.map(t => `#${t}`).join(' ')}</span>
-                        )}
-                      </span>
-                    </span>
-                  </span>
-                </a>
-              </li>
+                    </a>
+                  </li>
+                ))}
+              </ol>
             ))}
-          </ol>
+          </div>
           {/* Not aria-hidden: the count, the list's build date and the
               how-to-get-listed instruction are real content. */}
           <div className="proj-foot">

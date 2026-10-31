@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useSteadyHeight } from '../hooks/useSteadyHeight';
 import { useI18n, type SpecKey } from '../i18n';
 
 /* The readout keys are what `cosmos --info` prints: they stay as they are in
@@ -35,6 +36,8 @@ const ART = [
 export function Features() {
   const { t } = useI18n();
   const [open, setOpen] = useState<string | null>(null);
+  const blockRef = useRef<HTMLDivElement>(null);
+  useSteadyHeight(blockRef);
   const SPECS = SPEC_KEYS.map(key => ({ key, ...t.features.specs[key] }));
   return (
     <section className="section section-tinted" id="features">
@@ -44,7 +47,7 @@ export function Features() {
           <h2 className="cs-h1">{t.features.title}</h2>
           <p className="section-sub">{t.features.sub}</p>
         </div>
-        <div className="term-block" data-reveal>
+        <div className="term-block" data-reveal ref={blockRef}>
           <div className="term-cmd" aria-hidden="true">
             <span className="term-user">cosmos@gen3</span>:<span className="term-path">~/HelloWorld</span>$ cosmos --info
           </div>
@@ -63,10 +66,10 @@ export function Features() {
                   aria-expanded reports it. Hover and focus still preview the
                   description (sighted-only sugar via CSS). */}
               {SPECS.map(s => (
-                <li key={s.key} className="spec-row" data-open={open === s.key || undefined}>
+                <li key={s.key} className="term-row" data-open={open === s.key || undefined}>
                   <button
                     type="button"
-                    className="spec-btn"
+                    className="term-btn"
                     aria-expanded={open === s.key}
                     aria-controls={`spec-${s.key}`}
                     onClick={() => setOpen(o => (o === s.key ? null : s.key))}
@@ -76,7 +79,7 @@ export function Features() {
                       <span className="spec-value">{s.value}</span>
                     </span>
                   </button>
-                  <div className="spec-desc" id={`spec-${s.key}`}><p>{s.desc}</p></div>
+                  <div className="term-reveal spec-desc" id={`spec-${s.key}`}><p>{s.desc}</p></div>
                 </li>
               ))}
             </ul>

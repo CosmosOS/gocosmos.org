@@ -664,6 +664,56 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .term-path { color: #6CA4F8; font-weight: 700; }
 [data-theme='light'] .term-user, [data-theme='light'] .term-path { color: var(--fg-1); }
 
+/* One hover row for the three readouts. `cosmos --info` defines it and the
+   project listing and the git log reuse it as is, so a row reacts the same
+   way in every section: a tinted rounded row on hover / keyboard focus /
+   open, and its secondary text sliding open underneath. [data-open] is the
+   click/tap state each component sets (the touch path, where there is no
+   hover). The block's height never changes while rows open: useSteadyHeight
+   reserves the tallest one-row-open layout, so nothing below it moves. */
+.term-row {
+  padding: 7px 12px; margin: 0 -12px; border-radius: 8px;
+  transition: background var(--dur-fast);
+}
+/* :focus-visible, not :focus-within: a mouse click focuses the button too,
+   and that focus would hold the row open after a second click closed it. */
+.term-row:focus-visible, .term-row:has(:focus-visible), .term-row[data-open] { background: rgba(255, 255, 255, 0.05); }
+[data-theme='light'] .term-row:focus-visible, [data-theme='light'] .term-row:has(:focus-visible),
+[data-theme='light'] .term-row[data-open] { background: rgba(20, 20, 35, 0.06); }
+/* 0fr → 1fr height animation; the clipped child must carry no vertical
+   padding/margin or the track can't collapse to zero. */
+.term-reveal {
+  display: grid; grid-template-rows: 0fr; margin-top: 0;
+  transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
+}
+.term-row:focus-visible .term-reveal, .term-row:has(:focus-visible) .term-reveal,
+.term-row[data-open] .term-reveal { grid-template-rows: 1fr; margin-top: 5px; }
+/* Hover gated like every other :hover rule here: touch browsers keep the
+   last tapped element hovered, which would hold a row open after a tap
+   closed it. The pointed-at row wins: while one is hovered, any other row
+   left open by a click or keyboard focus folds away, so at most one row is
+   ever open and the reserved height always covers it. */
+@media (hover: hover) {
+  .term-row:hover { background: rgba(255, 255, 255, 0.05); }
+  [data-theme='light'] .term-row:hover { background: rgba(20, 20, 35, 0.06); }
+  .term-row:hover .term-reveal { grid-template-rows: 1fr; margin-top: 5px; }
+  .term-block:has(.term-row:hover) .term-row:not(:hover) { background: transparent; }
+  .term-block:has(.term-row:hover) .term-row:not(:hover) .term-reveal { grid-template-rows: 0fr; margin-top: 0; }
+}
+.term-reveal > * { overflow: hidden; min-height: 0; margin: 0; padding: 0; }
+/* useSteadyHeight's hidden measuring copy: rows must open instantly there. */
+.term-measure .term-reveal { transition: none; }
+/* Disclosure rows are a real <button> (aria-expanded in the component),
+   unstyled so the row family keeps one look. */
+.term-btn {
+  display: block; width: 100%; margin: 0; padding: 0;
+  background: none; border: 0; color: inherit; font: inherit;
+  text-align: left; cursor: pointer;
+}
+/* On touch there is no hover — rows start collapsed and a tap opens them
+   ([data-open] above); the taller padding makes 44px tap targets. */
+@media (hover: none) { .term-row { padding: 14px 12px; } }
+
 .readout {
   display: grid; grid-template-columns: auto 1fr; gap: 12px 72px;
 }
@@ -698,55 +748,39 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
    between the command line (1em) and the hover descriptions. The rem floor
    keeps them readable where the vw formula bottoms out. */
 .readout-specs { list-style: none; margin: 0; padding: 0; min-width: 0; font-size: max(0.72rem, 0.85em); }
-.spec-row {
-  padding: 7px 12px; margin: 0 -12px; border-radius: 8px;
-  transition: background var(--dur-fast);
-}
-/* Each row is a real disclosure <button> (aria-expanded in Features.tsx);
-   unstyled so the row family keeps one look. */
-.spec-btn {
-  display: block; width: 100%; margin: 0; padding: 0;
-  background: none; border: 0; color: inherit; font: inherit;
-  text-align: left; cursor: pointer;
-}
-.spec-row:hover, .spec-row:focus-within, .spec-row[data-open] { background: rgba(255, 255, 255, 0.05); }
-[data-theme='light'] .spec-row:hover, [data-theme='light'] .spec-row:focus-within,
-[data-theme='light'] .spec-row[data-open] { background: rgba(20, 20, 35, 0.06); }
+/* Rows are .term-row / .term-btn / .term-reveal (shared above). */
 .spec-line { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
 .spec-key { color: var(--halo, #F2EBDA); min-width: 6ch; flex-shrink: 0; }
 [data-theme='light'] .spec-key { color: var(--fg-1); font-weight: 600; }
 .spec-value { color: var(--fg-1); }
-/* 0fr → 1fr height animation; the clipped <p> must carry no vertical
-   padding/margin or the track can't collapse to zero. The left inset lives
-   here (at 1em, in ch) so the desc aligns under the value column. */
-.spec-desc {
-  display: grid; grid-template-rows: 0fr; margin-top: 0;
-  padding-left: calc(6ch + 18px);
-  transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
-}
-.spec-row:hover .spec-desc, .spec-row:focus-within .spec-desc,
-.spec-row[data-open] .spec-desc { grid-template-rows: 1fr; margin-top: 5px; }
+/* The left inset lives on the reveal (at 1em, in ch) so the desc aligns
+   under the value column. */
+.spec-desc { padding-left: calc(6ch + 18px); }
 .spec-desc p {
-  overflow: hidden; min-height: 0; margin: 0; padding: 0;
   color: var(--fg-2); font-size: var(--readout-desc); line-height: 1.6;
   max-width: 76ch;
 }
-/* On touch there is no hover — rows start collapsed and a tap toggles the
-   disclosure button ([data-open] above); bigger padding = 44px tap targets. */
 @media (max-width: 560px) { .spec-desc { padding-left: 0; } }
-@media (hover: none) { .spec-row { padding: 14px 12px; } }
 
 /* ============================================================
    Timeline — `git log --reverse` readout
    Same frameless terminal language as the Features and Projects
    readouts: mono, theme tokens, the cast-size scale. Three
    commits, oldest first, each in git's medium format (commit
-   line, Date, then the indented subject and body). Nothing here
-   is interactive, so there are no hover rows — the body is the
-   section's content and stays visible.
+   line, Date, then the indented subject and body). Each commit is
+   a .term-row like the Features specs: the header (commit line,
+   Date, subject) is the disclosure button, the body is the
+   secondary text that slides open on hover / focus / tap.
    ============================================================ */
 .git-log { list-style: none; margin: 0; padding: 0; line-height: 1.6; }
-.commit + .commit { margin-top: 1.75em; }
+/* git separates commits with a blank line; half of one, since the row
+   padding already adds air around each tinted commit. */
+.commit + .commit { margin-top: 0.5em; }
+/* The subject's <h3> wraps the disclosure button (the WAI accordion
+   pattern: a heading can't sit inside a <button>), so it carries none of
+   the heading defaults — the lines inside style themselves. */
+.commit-heading { margin: 0; font: inherit; letter-spacing: 0; }
+.commit-line, .commit-date, .commit-subject { display: block; }
 /* git paints the commit line and its decoration yellow; the site's
    "yellow" is the cream halo, the same highlight ink as .spec-key and
    .proj-name. HEAD and the branch keep git's cyan/green from the cast
@@ -759,28 +793,24 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 [data-theme='light'] .commit-head, [data-theme='light'] .commit-branch { color: var(--fg-1); }
 /* pre: keeps git's three-space `Date:   ` alignment. */
 .commit-date { white-space: pre; font-size: max(11px, 0.85em); color: var(--fg-3); }
-/* The message block: git indents it by four columns. The indent sits on
-   the wrapper (one 4ch at the block's 1em) so the subject and the smaller
-   body share the same left edge. Subject at the listing's primary weight
-   (.proj-name); body at --readout-desc, the description size the other
-   readouts expand to on hover. */
-.commit-msg { margin-top: 0.75em; padding-left: 4ch; }
+/* The message: git indents it by four columns. Both indents are 4ch at the
+   block's 1em (the body's reveal wrapper stays at 1em, only its <p> is
+   smaller) so the subject and the smaller body share the same left edge.
+   Subject at the listing's primary weight (.proj-name); body at
+   --readout-desc, the description size the other readouts expand to. */
 .commit-subject {
-  margin: 0; font-family: inherit; font-size: 1em; font-weight: 600;
-  line-height: 1.6; letter-spacing: 0; color: var(--fg-1);
+  margin-top: 0.75em; padding-left: 4ch;
+  font-size: 1em; font-weight: 600; line-height: 1.6; color: var(--fg-1);
 }
 .commit-current .commit-subject { color: var(--halo, #F2EBDA); }
 [data-theme='light'] .commit-current .commit-subject { color: var(--fg-1); }
+.commit-reveal { padding-left: 4ch; }
 /* No measure cap here, unlike .spec-desc p: those sit in the readout's right
-   column, this body is the section's content and fills the terminal width
-   like the command line above it. */
-.commit-body {
-  margin: 0.35em 0 0;
-  font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2);
-}
+   column, this body fills the terminal width like the command line above. */
+.commit-body { font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2); }
 /* Narrow phones: the indent costs 4 of ~40 columns, drop it (same call as
    .spec-desc). */
-@media (max-width: 560px) { .commit-msg { padding-left: 0; } }
+@media (max-width: 560px) { .commit-subject, .commit-reveal { padding-left: 0; } }
 
 /* ============================================================
    Contributors
@@ -821,28 +851,26 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 /* ============================================================
    Featured projects — `ls community/` readout
    Same frameless terminal language as the Features readout:
-   mono, theme tokens, hover rows. The listing flows down then
-   across (multicol), so the star ranking reads top-to-bottom.
+   mono, theme tokens, the same .term-row hover rows. The listing
+   flows down then across, so the star ranking reads top-to-bottom.
    ============================================================ */
-/* Grid, not multicol: rows collapse to one line (descriptions expand on
-   hover, same UI as .spec-desc), and multicol would rebalance both columns
-   on every expansion. auto-flow column keeps the star ranking reading
-   top-to-bottom; the row count comes inline from the component. */
+/* Two independent columns (one <ol> each, built in Projects.tsx), not a
+   shared grid or multicol: rows collapse to one line and expand on hover,
+   and a shared grid row would push the other column down with it (multicol
+   would even rebalance items across columns). Separate columns let an
+   expanding row move only the rows under it, as in the Features readout. */
 .proj-list {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column;
-  column-gap: 72px; align-content: start;
+  display: grid; grid-template-columns: 1fr 1fr;
+  column-gap: 72px; align-items: start;
 }
+.proj-col { list-style: none; margin: 0; padding: 0; min-width: 0; }
 @media (max-width: 880px) { .proj-list { display: block; } }
 
+/* Row chrome (padding, tint, reveal) is .term-row; the link only lays out. */
 .proj-row {
   display: flex; gap: 14px; align-items: baseline;
-  padding: 9px 12px; margin: 0 -12px; border-radius: 8px;
   text-decoration: none; color: inherit;
-  transition: background var(--dur-fast);
 }
-.proj-row:hover, .proj-row:focus-visible { background: rgba(255, 255, 255, 0.05); }
-[data-theme='light'] .proj-row:hover, [data-theme='light'] .proj-row:focus-visible { background: rgba(20, 20, 35, 0.06); }
 
 .proj-idx { font-size: max(10.5px, 0.8em); color: var(--fg-3); flex-shrink: 0; }
 /* No gap: the collapsed desc wrap would still reserve it. Spacing comes
@@ -854,7 +882,13 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 .proj-owner { color: var(--fg-3); font-size: max(11px, 0.85em); }
 .proj-name { color: var(--halo, #F2EBDA); font-weight: 600; }
 [data-theme='light'] .proj-name { color: var(--fg-1); }
-.proj-row:hover .proj-name, .proj-row:focus-visible .proj-name { text-decoration: underline; text-underline-offset: 3px; }
+/* The one addition to the shared row: the name underlines, since these
+   rows are links out to GitHub rather than disclosures. */
+.proj-row:focus-visible .proj-name,
+.proj-row[data-open] .proj-name { text-decoration: underline; text-underline-offset: 3px; }
+@media (hover: hover) {
+  .proj-row:hover .proj-name { text-decoration: underline; text-underline-offset: 3px; }
+}
 
 .proj-stars {
   display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
@@ -862,27 +896,16 @@ html:not([data-motion='off']) .term-player .ap-overlay.ap-overlay-start { displa
 }
 .proj-stars svg { width: 1em; height: 1em; }
 
-/* Same 0fr → 1fr reveal as .spec-desc; the clipped inner span must carry
-   no vertical padding/margin or the track can't collapse to zero. */
-.proj-desc-wrap {
-  display: grid; grid-template-rows: 0fr; margin-top: 0;
-  transition: grid-template-rows 260ms var(--ease-out), margin-top 260ms var(--ease-out);
-}
-/* .open is the touch accordion state (set in Projects.tsx): rows are links,
-   so the first tap expands instead of navigating and the second follows. */
-.proj-row:hover .proj-desc-wrap, .proj-row:focus-visible .proj-desc-wrap, .proj-row.open .proj-desc-wrap { grid-template-rows: 1fr; margin-top: 3px; }
-.proj-row.open { background: rgba(255, 255, 255, 0.05); }
-[data-theme='light'] .proj-row.open { background: rgba(20, 20, 35, 0.06); }
-.proj-row.open .proj-name { text-decoration: underline; text-underline-offset: 3px; }
+/* The description is a .term-reveal. [data-open] is the touch accordion
+   state (set in Projects.tsx): rows are links, so the first tap expands
+   instead of navigating and the second follows. */
 .proj-desc {
-  display: block; overflow: hidden; min-height: 0;
-  font-size: var(--readout-desc); line-height: 1.55; color: var(--fg-2);
+  display: block;
+  font-size: var(--readout-desc); line-height: 1.6; color: var(--fg-2);
 }
 .proj-topics { color: var(--fg-3); font-size: 0.92em; }
 
 .proj-foot { margin-top: 16px; font-size: max(11px, 0.75em); color: var(--fg-3); }
-/* Touch: taller rows so the two-step tap accordion clears 44px. */
-@media (hover: none) { .proj-row { padding: 12px; } }
 .proj-foot-topic { color: var(--fg-1); }
 
 /* ============================================================
