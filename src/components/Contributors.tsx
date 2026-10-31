@@ -24,7 +24,7 @@ export function Contributors() {
   // Digit grouping follows the page language (2,907 / 2 907 / 2,907).
   const fmt = new Intl.NumberFormat(info.lang);
 
-  /** "Gen2 · 2,907 commits" — what the avatar's tooltip and its label say. */
+  /** "Gen2 · 2,907 commits": what the avatar's tooltip and its label say. */
   const describe = (c: Contributor): string => {
     const gens = [c.gen2 > 0 && 'Gen2', c.gen3 > 0 && 'Gen3'].filter(Boolean).join(' + ');
     return `${gens} · ${t.contributors.commits(c.contributions, fmt.format(c.contributions))}`;
@@ -41,7 +41,7 @@ export function Contributors() {
         <div className="avatar-wall" data-reveal>
           {CONTRIBUTORS.map(c => {
             const isGen3 = c.gen3 > 0;
-            const label = `${c.login} — ${describe(c)}`;
+            const label = `${c.login} (${describe(c)})`;
             const inner = (
               <>
                 {c.avatar_url
@@ -50,7 +50,7 @@ export function Contributors() {
                 {isGen3 && <span className="avatar-badge" aria-hidden="true">G3</span>}
               </>
             );
-            // No GitHub account to open, so it must not be a link — a link
+            // No GitHub account to open, so it must not be a link: a link
             // that goes nowhere is worse than a plain avatar. role="img"
             // carries the name that the anchor's aria-label carries below.
             return c.linked && c.html_url ? (
@@ -60,7 +60,7 @@ export function Contributors() {
                 href={c.html_url}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={`${label} — ${t.contributors.profile}`}
+                aria-label={t.contributors.profile(label)}
                 title={label}
               >
                 {inner}

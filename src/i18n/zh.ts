@@ -87,7 +87,7 @@ export const zh: Strings = {
     title: '由社区建成。',
     sub: people => `Cosmos 历史上的每一位作者：横跨两代共 ${people} 人，从 2007 年的概念验证到 Gen3。`,
     commits: (_n, formatted) => `${formatted} 次提交`,
-    profile: 'GitHub 个人主页',
+    profile: who => `${who}，GitHub 个人主页`,
   },
   footer: {
     tagline: '用 C# 在裸机上打造。',

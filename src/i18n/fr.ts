@@ -87,7 +87,7 @@ export const fr: Strings = {
     title: 'Construit par la communauté.',
     sub: people => `Tous les auteurs de l’histoire de Cosmos : ${people} personnes sur les deux générations, de la preuve de concept de 2007 à Gen3.`,
     commits: (n, formatted) => `${formatted} commit${n === 1 ? '' : 's'}`,
-    profile: 'profil GitHub',
+    profile: who => `${who}, profil GitHub`,
   },
   footer: {
     tagline: 'Fait en C# sur du matériel nu.',

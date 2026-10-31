@@ -3,8 +3,8 @@ import type { Strings } from './types';
 /* The reference copy: fr.ts and zh.ts translate this file. */
 export const en: Strings = {
   meta: {
-    title: 'Cosmos — Write an OS in modern C#',
-    description: 'Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on bare metal — x64 or ARM64.',
+    title: 'Cosmos: Write an OS in modern C#',
+    description: 'Cosmos is an open-source C# operating system framework. Author your kernel in C# 14, compile it with NativeAOT, and boot it on x64 or ARM64 bare metal.',
   },
   nav: {
     skip: 'Skip to content',
@@ -18,7 +18,7 @@ export const en: Strings = {
     toggleTheme: 'Toggle theme',
     github: 'GitHub',
     getStarted: 'Get started',
-    getStartedLabel: 'Get started — Cosmos documentation',
+    getStartedLabel: 'Get started: Cosmos documentation',
     language: 'Language',
   },
   hero: {
@@ -40,8 +40,8 @@ export const en: Strings = {
     specs: {
       build: { value: 'dotnet build → bootable ISO', desc: 'The Cosmos build pipeline runs NativeAOT codegen, assemble, link and pack a bootable ISO for the Limine bootloader.' },
       plugs: { value: 'IL patching with Mono.Cecil', desc: 'Cosmos.Patcher replaces runtime methods at the IL level before NativeAOT compiles them.' },
-      arch: { value: 'x64 · ARM64 — RISC-V planned', desc: 'Target selected by RuntimeIdentifier: APIC interrupts on x64, GIC on ARM64, GAS assembly on both, MMIO where there is no port I/O.' },
-      bcl: { value: 'the real .NET BCL', desc: 'Strings, collections, generics, threading, Console — compiled by NativeAOT, no JIT, no managed runtime.' },
+      arch: { value: 'x64 · ARM64, RISC-V planned', desc: 'Target selected by RuntimeIdentifier: APIC interrupts on x64, GIC on ARM64, GAS assembly on both, MMIO where there is no port I/O.' },
+      bcl: { value: 'the real .NET BCL', desc: 'Strings, collections, generics, threading and Console, all compiled by NativeAOT with no JIT and no managed runtime.' },
       kernel: { value: 'GC · scheduler · exceptions', desc: 'Mark-and-sweep GC with precise stack scanning, a preemptive priority-based stride scheduler with lock support, exception handling with unwinding.' },
       net: { value: 'System.Net.Sockets', desc: 'TCP and UDP sockets over Cosmos’ own network stack: ARP, IPv4, DHCP and DNS. HTTPS/TLS is on the roadmap.' },
       disk: { value: 'System.IO down to the disk', desc: 'AHCI/SATA and NVMe drivers, MBR/GPT/EBR partitioning, FAT12/16/32 on a Unix-style VFS.' },
@@ -70,7 +70,7 @@ export const en: Strings = {
         body: 'Original Cosmos. Proof that you could compile C# down to something that boots on bare metal. A small project with a big idea.',
       },
       gen2: {
-        date: '2010s — 2024',
+        date: '2010s to 2024',
         subject: 'IL2CPU era.',
         body: 'A custom IL-to-x86 compiler, built and maintained by the community for over a decade. IL2CPU translated .NET bytecode straight to assembly, and powered hobby OSes for years.',
       },
@@ -84,9 +84,9 @@ export const en: Strings = {
   contributors: {
     eyebrow: '// the people',
     title: 'Built by the community.',
-    sub: people => `Every author in the Cosmos history — ${people} people across both generations, from the 2007 proof of concept to Gen3.`,
+    sub: people => `Every author in the Cosmos history: ${people} people across both generations, from the 2007 proof of concept to Gen3.`,
     commits: (n, formatted) => `${formatted} commit${n === 1 ? '' : 's'}`,
-    profile: 'GitHub profile',
+    profile: who => `${who}, GitHub profile`,
   },
   footer: {
     tagline: 'Made with C# on bare metal.',

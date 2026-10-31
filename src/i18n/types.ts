@@ -66,9 +66,10 @@ export interface Strings {
     eyebrow: string;
     title: string;
     sub: (people: string) => string;
-    /** "2,907 commits" — n for the plural rule, formatted for display. */
+    /** "2,907 commits": n for the plural rule, formatted for display. */
     commits: (n: number, formatted: string) => string;
-    profile: string;
+    /** Avatar link name: the tooltip text plus where the link goes. */
+    profile: (who: string) => string;
   };
   footer: {
     tagline: string;
