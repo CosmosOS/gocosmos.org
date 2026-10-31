@@ -1,11 +1,14 @@
 import type { Strings } from './types';
 
 /* French. « vous » for the reader, a space before : ; ! ?, product and
-   technology names kept in English (Cosmos, NativeAOT, IL2CPU, .NET, C#). */
+   technology names kept in English (Cosmos, NativeAOT, IL2CPU, .NET, C#).
+   Where the French calque means nothing to a developer, use the English
+   word French developers actually say: « sur du hardware » for bare metal
+   (not « matériel nu » or « sur le métal »), « bootloader » for the loader. */
 export const fr: Strings = {
   meta: {
     title: 'Cosmos : écrivez un OS en C# moderne',
-    description: 'Cosmos est un framework open source pour écrire un système d’exploitation en C#. Écrivez votre noyau en C# 14, compilez-le avec NativeAOT et démarrez-le sur du matériel nu, x64 ou ARM64.',
+    description: 'Cosmos est un framework open source pour écrire un système d’exploitation en C#. Écrivez votre noyau en C# 14, compilez-le avec NativeAOT et démarrez-le sur du hardware x64 ou ARM64.',
   },
   nav: {
     skip: 'Aller au contenu',
@@ -36,10 +39,10 @@ export const fr: Strings = {
   },
   features: {
     eyebrow: '// ce qu’il y a dedans',
-    title: 'Tout ce qu’il faut pour démarrer du C# sur du matériel nu.',
+    title: 'Tout ce qu’il faut pour démarrer du C# sur du hardware.',
     sub: 'Gen3 remplace IL2CPU par la chaîne d’outils .NET officielle. Tout ce qui est au-dessus (GC, ordonnanceur, pilotes, réseau, système de fichiers) est du C# que vous pouvez lire, plugger ou remplacer.',
     specs: {
-      build: { value: 'dotnet build → ISO amorçable', desc: 'Le pipeline de build Cosmos enchaîne la génération de code NativeAOT, l’assemblage et l’édition de liens, puis produit une ISO amorçable pour le chargeur Limine.' },
+      build: { value: 'dotnet build → ISO amorçable', desc: 'Le pipeline de build Cosmos enchaîne la génération de code NativeAOT, l’assemblage et l’édition de liens, puis produit une ISO amorçable pour le bootloader Limine.' },
       plugs: { value: 'patching IL avec Mono.Cecil', desc: 'Cosmos.Patcher remplace des méthodes du runtime au niveau IL avant que NativeAOT ne les compile.' },
       arch: { value: 'x64 · ARM64, RISC-V prévu', desc: 'Cible choisie par le RuntimeIdentifier : interruptions APIC sur x64, GIC sur ARM64, assembleur GAS sur les deux, MMIO là où il n’y a pas d’E/S par port.' },
       bcl: { value: 'la vraie BCL .NET', desc: 'Chaînes, collections, génériques, threads, Console : compilés par NativeAOT, sans JIT ni runtime managé.' },
@@ -62,13 +65,13 @@ export const fr: Strings = {
   },
   timeline: {
     eyebrow: '// trois générations',
-    title: 'Dix-huit ans de C# sur le métal.',
+    title: 'Dix-huit ans de C# sur du hardware.',
     sub: 'Cosmos a eu trois vies. Gen3 est la plus grande refondation depuis la naissance du projet.',
     eras: {
       gen1: {
         date: '2007',
         subject: 'La preuve.',
-        body: 'Le Cosmos d’origine. La preuve qu’on pouvait compiler du C# en quelque chose qui démarre sur du matériel nu. Un petit projet avec une grande idée.',
+        body: 'Le Cosmos d’origine. La preuve qu’on pouvait compiler du C# en quelque chose qui démarre sur du hardware. Un petit projet avec une grande idée.',
       },
       gen2: {
         date: 'années 2010 à 2024',
@@ -90,7 +93,7 @@ export const fr: Strings = {
     profile: who => `${who}, profil GitHub`,
   },
   footer: {
-    tagline: 'Fait en C# sur du matériel nu.',
+    tagline: 'Fait en C# sur du hardware.',
     project: 'Projet',
     community: 'Communauté',
     resources: 'Ressources',
